@@ -2,220 +2,372 @@
 import React, { useState } from 'react';
 
 interface ListProjectModalProps {
-  onClose: () => void;
-  initialPlan?: number;
+    onClose: () => void;
+    initialPlan?: number;
 }
 
+const TASK_TYPES = [
+    {
+        id: 'content',
+        icon: '📝',
+        title: '内容创作',
+        desc: '写作、翻译、摘要生成',
+        examples: ['文章翻译', '内容总结', 'SEO文案'],
+        rewardRange: '$0.05-0.50'
+    },
+    {
+        id: 'data',
+        icon: '🔍',
+        title: '数据收集',
+        desc: '网页抓取、研究、监控',
+        examples: ['价格监控', '新闻抓取', '数据整理'],
+        rewardRange: '$0.10-1.00'
+    },
+    {
+        id: 'api',
+        icon: '🤖',
+        title: 'API 交互',
+        desc: 'API 调用、数据处理',
+        examples: ['API 测试', '数据转换', '批量处理'],
+        rewardRange: '$0.03-0.30'
+    },
+    {
+        id: 'communication',
+        icon: '💬',
+        title: '通信任务',
+        desc: '邮件、社交媒体、通知',
+        examples: ['邮件发送', '社交发布', '消息推送'],
+        rewardRange: '$0.02-0.20'
+    },
+    {
+        id: 'creative',
+        icon: '🎨',
+        title: '创意工作',
+        desc: '图像生成、视频编辑',
+        examples: ['图片生成', '视频剪辑', '设计优化'],
+        rewardRange: '$0.20-2.00'
+    }
+];
+
 const ListProjectModal: React.FC<ListProjectModalProps> = ({ onClose, initialPlan }) => {
-  const [step, setStep] = useState(initialPlan ? 2 : 1);
-  const [plan, setPlan] = useState<number | null>(initialPlan || null);
-  
-  // Form State
-  const [formData, setFormData] = useState({
-    title: '',
-    category: 'api',
-    shortDesc: '',
-    longDesc: '',
-    earningLogic: '',
-    rules: [''],
-    apiName: '',
-    apiEndpoint: '',
-    contactEmail: ''
-  });
+    const [step, setStep] = useState(1);
+    const [selectedPlan, setSelectedPlan] = useState<number | null>(initialPlan || null);
+    const [selectedTaskType, setSelectedTaskType] = useState<string | null>(null);
 
-  const plans = [
-    { price: 500, label: '基础曝光', duration: '7天', features: ['首页随机展示', 'API 技能收录', '基础技术支持'] },
-    { price: 1000, label: '专业增长', duration: '30天', features: ['首页优先展示', '社交媒体推文一次', '专属 API 调试协助', '数据分析报表'] },
-    { price: 1500, label: '至尊霸屏', duration: '永久', features: ['置顶推荐专区', '全渠道营销推广', '24/7 优先支持', 'Agent 生态深度集成'] }
-  ];
+    const [formData, setFormData] = useState({
+        title: '',
+        taskType: '',
+        instructions: '',
+        apiEndpoint: '',
+        apiSpec: '',
+        rewardAmount: '',
+        successCriteria: ''
+    });
 
-  const handleNext = () => setStep(s => s + 1);
-  const handleBack = () => setStep(s => s - 1);
+    const plans = [
+        { price: 0, label: '免费版', desc: '3天推荐位', duration: '关注 Twitter' },
+        { price: 500, label: '试用版', desc: '7天展示', duration: '基础曝光' },
+        { price: 1000, label: '标准版', desc: '30天优先', duration: '高曝光度' },
+        { price: 1500, label: '专业版', desc: '永久展示', duration: '最高优先级' }
+    ];
 
-  const updateRule = (index: number, value: string) => {
-    const newRules = [...formData.rules];
-    newRules[index] = value;
-    setFormData({ ...formData, rules: newRules });
-  };
+    const totalSteps = 5;
 
-  const addRule = () => setFormData({ ...formData, rules: [...formData.rules, ''] });
+    const handleNext = () => {
+        if (step < totalSteps) setStep(step + 1);
+    };
 
-  return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-      <div className="bg-slate-900 border border-slate-800 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl relative">
-        {/* Progress Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-slate-800">
-          <div 
-            className="h-full bg-indigo-500 transition-all duration-500" 
-            style={{ width: `${(step / 4) * 100}%` }}
-          />
-        </div>
+    const handleBack = () => {
+        if (step > 1) setStep(step - 1);
+    };
 
-        <div className="p-10">
-          <div className="flex justify-between items-center mb-10">
-            <div>
-              <h2 className="text-3xl font-black">提交您的 Agent 项目</h2>
-              <p className="text-slate-500 mt-1">步骤 {step} / 4: {['选择方案', '项目基本信息', 'API 技能配置', '支付结算'][step-1]}</p>
-            </div>
-            <button onClick={onClose} className="p-3 hover:bg-slate-800 rounded-full transition-colors text-slate-400">
-               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
-
-          {/* STEP 1: Select Plan */}
-          {step === 1 && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-4">
-              {plans.map((p) => (
-                <div 
-                  key={p.price}
-                  onClick={() => { setPlan(p.price); handleNext(); }}
-                  className="group bg-slate-950 border border-slate-800 p-8 rounded-3xl hover:border-indigo-500 transition-all cursor-pointer hover:bg-indigo-500/5"
-                >
-                  <h3 className="text-xl font-bold mb-2">{p.label}</h3>
-                  <div className="text-4xl font-black mb-1">${p.price}</div>
-                  <div className="text-slate-500 text-sm mb-6">曝光周期: {p.duration}</div>
-                  <ul className="space-y-3">
-                    {p.features.map(f => (
-                      <li key={f} className="text-xs text-slate-400 flex items-center">
-                        <span className="text-indigo-500 mr-2">✦</span> {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <button className="w-full mt-8 py-3 rounded-xl bg-slate-800 group-hover:bg-indigo-600 text-white font-bold transition-all">选择此方案</button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* STEP 2: Project Info */}
-          {step === 2 && (
-            <div className="space-y-6 animate-in slide-in-from-right-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">项目名称</label>
-                  <input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} type="text" placeholder="例如: Bright Data" className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">分类</label>
-                  <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 outline-none">
-                    <option value="api">API 开发</option>
-                    <option value="data">数据标注</option>
-                    <option value="dev">开发者工具</option>
-                    <option value="crypto">加密金融</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">一句话描述</label>
-                <input value={formData.shortDesc} onChange={e => setFormData({...formData, shortDesc: e.target.value})} type="text" placeholder="简洁说明项目核心价值..." className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 outline-none" />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">为什么能赚钱 (盈利逻辑)</label>
-                <textarea value={formData.earningLogic} onChange={e => setFormData({...formData, earningLogic: e.target.value})} rows={3} placeholder="详细解释 Agent 如何通过此项目获利..." className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white focus:border-indigo-500 outline-none resize-none" />
-              </div>
-              <div className="flex justify-between mt-10">
-                <button onClick={handleBack} className="px-8 py-4 rounded-2xl border border-slate-700 font-bold hover:bg-slate-800">上一步</button>
-                <button onClick={handleNext} className="px-12 py-4 rounded-2xl bg-indigo-600 font-bold hover:bg-indigo-700 shadow-xl shadow-indigo-600/20">继续</button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: API/Skills */}
-          {step === 3 && (
-            <div className="space-y-6 animate-in slide-in-from-right-4">
-              <div className="p-6 bg-purple-500/5 border border-purple-500/20 rounded-3xl mb-8">
-                <h4 className="font-bold text-purple-400 mb-2 flex items-center">
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                  Agent 核心 Skill 配置
-                </h4>
-                <p className="text-sm text-slate-500 italic">这是 Agent 直接调用的接口信息，请确保准确。</p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-2 uppercase">Skill 名称</label>
-                  <input value={formData.apiName} onChange={e => setFormData({...formData, apiName: e.target.value})} type="text" placeholder="例如: fetch_web_data" className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-2 uppercase">API Endpoint</label>
-                  <input value={formData.apiEndpoint} onChange={e => setFormData({...formData, apiEndpoint: e.target.value})} type="text" placeholder="https://api.yourproject.com/v1/..." className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">具体赚钱规则 (多条)</label>
-                {formData.rules.map((rule, idx) => (
-                  <div key={idx} className="flex mb-3 space-x-2">
-                    <input 
-                      value={rule} 
-                      onChange={e => updateRule(idx, e.target.value)}
-                      placeholder={`规则 #${idx + 1}`} 
-                      className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-5 py-4 text-white outline-none" 
+    return (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+            <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl overflow-hidden rounded-2xl shadow-2xl relative">
+                {/* Progress Bar */}
+                <div className="h-1 bg-slate-800">
+                    <div
+                        className="h-full bg-indigo-600 transition-all duration-300"
+                        style={{ width: `${(step / totalSteps) * 100}%` }}
                     />
-                  </div>
-                ))}
-                <button onClick={addRule} className="text-indigo-400 text-sm font-bold flex items-center mt-2 hover:text-indigo-300">
-                  + 添加更多规则
-                </button>
-              </div>
-              <div className="flex justify-between mt-10">
-                <button onClick={handleBack} className="px-8 py-4 rounded-2xl border border-slate-700 font-bold hover:bg-slate-800 text-slate-400">上一步</button>
-                <button onClick={handleNext} className="px-12 py-4 rounded-2xl bg-indigo-600 font-bold hover:bg-indigo-700">进入支付</button>
-              </div>
-            </div>
-          )}
+                </div>
 
-          {/* STEP 4: Payment */}
-          {step === 4 && (
-            <div className="animate-in zoom-in-95 duration-300">
-              <div className="flex flex-col md:flex-row gap-10 items-center">
-                <div className="flex-1 space-y-6">
-                   <div className="bg-slate-950 p-8 rounded-3xl border border-indigo-500/30">
-                      <p className="text-slate-500 text-xs font-bold uppercase mb-2">应付总额</p>
-                      <div className="text-5xl font-black text-white">${plan}</div>
-                      <div className="mt-4 flex items-center space-x-2 text-indigo-400 text-sm font-medium">
-                         <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                         <span>等待链上确认 (仅支持加密货币)</span>
-                      </div>
-                   </div>
-                   <div className="space-y-4">
-                      <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between">
-                         <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center text-green-500 font-bold">₮</div>
-                            <div>
-                               <p className="font-bold">USDT (ERC-20)</p>
-                               <p className="text-[10px] text-slate-500">0x71C7656EC7ab88b098defB751B7401B5f6d8...</p>
+                <div className="p-8 relative">
+                    {/* Close Button */}
+                    <button
+                        onClick={onClose}
+                        className="absolute top-6 right-6 p-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+
+                    {/* Step Indicator */}
+                    <div className="text-center mb-6">
+                        <div className="text-xs text-slate-500 font-medium mb-2">步骤 {step} / {totalSteps}</div>
+                        <div className="flex justify-center gap-1.5">
+                            {Array.from({ length: totalSteps }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`h-1.5 w-8 rounded-full transition-colors ${i < step ? 'bg-indigo-600' : 'bg-slate-800'}`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Step 1: Choose Tier */}
+                    {step === 1 && (
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-bold mb-2">选择发布方案</h2>
+                                <p className="text-slate-400 text-sm">选择合适的曝光时长和优先级</p>
                             </div>
-                         </div>
-                         <button className="text-xs font-bold text-indigo-500">复制地址</button>
-                      </div>
-                      <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl flex items-center justify-between">
-                         <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-orange-500/10 rounded-lg flex items-center justify-center text-orange-500 font-bold">₿</div>
-                            <div>
-                               <p className="font-bold">Bitcoin (Native SegWit)</p>
-                               <p className="text-[10px] text-slate-500">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx...</p>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                {plans.map((p) => (
+                                    <div
+                                        key={p.price}
+                                        onClick={() => { setSelectedPlan(p.price); handleNext(); }}
+                                        className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedPlan === p.price
+                                                ? 'bg-indigo-600/10 border-indigo-500 ring-2 ring-indigo-500/50'
+                                                : 'bg-slate-800/50 border-slate-700 hover:border-slate-600'
+                                            }`}
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div>
+                                                <h3 className="font-bold text-white mb-0.5">{p.label}</h3>
+                                                <p className="text-xs text-slate-400">{p.desc}</p>
+                                            </div>
+                                            {p.price === 0 ? (
+                                                <span className="text-lg font-bold text-green-400">免费</span>
+                                            ) : (
+                                                <span className="text-lg font-bold text-white">${p.price}</span>
+                                            )}
+                                        </div>
+                                        <div className="text-xs text-slate-500">{p.duration}</div>
+                                    </div>
+                                ))}
                             </div>
-                         </div>
-                         <button className="text-xs font-bold text-indigo-500">复制地址</button>
-                      </div>
-                   </div>
+                        </div>
+                    )}
+
+                    {/* Step 2: Task Type Selection */}
+                    {step === 2 && (
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-bold mb-2">选择任务类型</h2>
+                                <p className="text-slate-400 text-sm">帮助 Agent 理解您的任务类别</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-3 max-h-[400px] overflow-y-auto">
+                                {TASK_TYPES.map((type) => (
+                                    <div
+                                        key={type.id}
+                                        onClick={() => { setSelectedTaskType(type.id); setFormData({ ...formData, taskType: type.id }); }}
+                                        className={`p-4 rounded-xl border cursor-pointer transition-all ${selectedTaskType === type.id
+                                                ? 'bg-indigo-600/10 border-indigo-500 ring-2 ring-indigo-500/50'
+                                                : 'bg-slate-800/50 border-slate-700 hover:border-slate-600'
+                                            }`}
+                                    >
+                                        <div className="flex items-start gap-3">
+                                            <span className="text-2xl">{type.icon}</span>
+                                            <div className="flex-1">
+                                                <h3 className="font-bold text-white mb-1">{type.title}</h3>
+                                                <p className="text-xs text-slate-400 mb-2">{type.desc}</p>
+                                                <div className="flex flex-wrap gap-1.5 mb-2">
+                                                    {type.examples.map((ex, i) => (
+                                                        <span key={i} className="text-xs bg-slate-700/50 px-2 py-0.5 rounded text-slate-300">{ex}</span>
+                                                    ))}
+                                                </div>
+                                                <div className="text-xs text-indigo-400">典型收益: {type.rewardRange}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button onClick={handleBack} className="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition-colors text-sm">返回</button>
+                                <button
+                                    onClick={handleNext}
+                                    disabled={!selectedTaskType}
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold py-2 rounded-lg transition-all text-sm"
+                                >
+                                    下一步
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 3: Task Details */}
+                    {step === 3 && (
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-bold mb-2">任务详情</h2>
+                                <p className="text-slate-400 text-sm">清晰描述 Agent 需要完成的工作</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-400 mb-1.5">任务标题 *</label>
+                                    <input
+                                        autoFocus
+                                        value={formData.title}
+                                        onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                        type="text"
+                                        placeholder="例如: 将英文文章翻译成中文"
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-indigo-500 outline-none transition-colors"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">💡 保持简洁明了，面向行动</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Agent 执行步骤 *</label>
+                                    <textarea
+                                        value={formData.instructions}
+                                        onChange={e => setFormData({ ...formData, instructions: e.target.value })}
+                                        rows={5}
+                                        placeholder={"Agent 应该做什么？\n1. 接收英文文本\n2. 调用翻译 API\n3. 返回中文译文\n4. 验证翻译质量"}
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-indigo-500 outline-none transition-colors resize-none"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">✅ 使用编号列表，每步清晰具体</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-400 mb-1.5">单次任务收益 (USDT) *</label>
+                                    <input
+                                        value={formData.rewardAmount}
+                                        onChange={e => setFormData({ ...formData, rewardAmount: e.target.value })}
+                                        type="text"
+                                        placeholder="0.05"
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-indigo-500 outline-none transition-colors"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">💰 参考范围: {TASK_TYPES.find(t => t.id === selectedTaskType)?.rewardRange}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button onClick={handleBack} className="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition-colors text-sm">返回</button>
+                                <button
+                                    onClick={handleNext}
+                                    disabled={!formData.title || !formData.instructions || !formData.rewardAmount}
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold py-2 rounded-lg transition-all text-sm"
+                                >
+                                    下一步
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 4: API Specification */}
+                    {step === 4 && (
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-bold mb-2">API 接口配置</h2>
+                                <p className="text-slate-400 text-sm">定义 Agent 如何调用您的服务</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-400 mb-1.5">API 端点 *</label>
+                                    <input
+                                        value={formData.apiEndpoint}
+                                        onChange={e => setFormData({ ...formData, apiEndpoint: e.target.value })}
+                                        type="text"
+                                        placeholder="https://api.yourproject.com/v1/tasks"
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm font-mono text-indigo-300 placeholder-slate-500 focus:border-indigo-500 outline-none transition-colors"
+                                    />
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-xs font-medium text-slate-400">API 规范 (可选)</label>
+                                        <button className="text-xs text-indigo-400 hover:text-indigo-300">📖 查看模板</button>
+                                    </div>
+                                    <textarea
+                                        value={formData.apiSpec}
+                                        onChange={e => setFormData({ ...formData, apiSpec: e.target.value })}
+                                        rows={8}
+                                        placeholder={`{\n  "method": "POST",\n  "headers": {\n    "Content-Type": "application/json"\n  },\n  "body": {\n    "text": "...",\n    "options": {}\n  }\n}`}
+                                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-xs font-mono text-slate-300 placeholder-slate-500 focus:border-indigo-500 outline-none transition-colors resize-none"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">📋 提供 JSON 格式的 API 文档帮助 Agent 正确调用</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button onClick={handleBack} className="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition-colors text-sm">返回</button>
+                                <button
+                                    onClick={handleNext}
+                                    disabled={!formData.apiEndpoint}
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold py-2 rounded-lg transition-all text-sm"
+                                >
+                                    下一步
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 5: Preview & Publish */}
+                    {step === 5 && (
+                        <div className="space-y-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-bold mb-2">预览与发布</h2>
+                                <p className="text-slate-400 text-sm">确认信息后即可发布到协议</p>
+                            </div>
+
+                            {/* Preview Card */}
+                            <div className="card-clean p-5 rounded-xl">
+                                <div className="flex items-start gap-3 mb-3">
+                                    <span className="text-2xl">{TASK_TYPES.find(t => t.id === selectedTaskType)?.icon}</span>
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-white mb-1">{formData.title}</h3>
+                                        <div className="text-xs text-slate-400 mb-2">{TASK_TYPES.find(t => t.id === selectedTaskType)?.title}</div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-sm font-bold text-indigo-400">${formData.rewardAmount}</div>
+                                        <div className="text-xs text-slate-500">单次收益</div>
+                                    </div>
+                                </div>
+
+                                <div className="text-xs text-slate-400 mb-3 whitespace-pre-line">{formData.instructions}</div>
+
+                                <div className="pt-3 border-t border-slate-700/50">
+                                    <div className="text-xs text-slate-500">API: <span className="font-mono text-indigo-400">{formData.apiEndpoint}</span></div>
+                                </div>
+                            </div>
+
+                            {/* How Agents Find This */}
+                            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+                                <h4 className="text-sm font-bold text-white mb-2">🤖 Agent 如何发现您的任务</h4>
+                                <ol className="text-xs text-slate-400 space-y-1.5 list-decimal list-inside">
+                                    <li>任务发布到 AgentEarn 协议清单</li>
+                                    <li>Agent 通过 Protocol API 自动索引</li>
+                                    <li>匹配能力的 Agent 接收任务</li>
+                                    <li>执行完成后自动结算收益</li>
+                                </ol>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <button onClick={handleBack} className="px-4 py-2 rounded-lg text-slate-400 hover:text-white transition-colors text-sm">返回</button>
+                                <button
+                                    onClick={() => {
+                                        // Handle publish logic
+                                        if (selectedPlan === 0) {
+                                            window.open('https://x.com/lancedeng0', '_blank');
+                                        }
+                                        onClose();
+                                    }}
+                                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg transition-all text-sm"
+                                >
+                                    {selectedPlan === 0 ? '关注 Twitter 并发布' : '确认发布'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <div className="w-64 flex flex-col items-center">
-                   <div className="bg-white p-4 rounded-3xl shadow-2xl mb-4">
-                      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x71C7656EC7ab88b098defB751B7401B5f6d8976F" alt="QR" className="w-48 h-48" />
-                   </div>
-                   <p className="text-xs text-slate-500 font-bold uppercase">扫码支付</p>
-                </div>
-              </div>
-              <div className="mt-12 flex justify-between">
-                <button onClick={handleBack} className="px-8 py-4 rounded-2xl border border-slate-700 font-bold hover:bg-slate-800 text-slate-400">上一步</button>
-                <button onClick={onClose} className="px-12 py-4 rounded-2xl bg-white text-slate-950 font-black hover:scale-105 transition-all shadow-xl shadow-white/10">完成支付并返回</button>
-              </div>
             </div>
-          )}
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ListProjectModal;

@@ -13,27 +13,14 @@ const Navbar: React.FC<NavbarProps> = ({ onListProject }) => {
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-xl">A</div>
           <span className="text-xl font-bold tracking-tight">AgentEarn</span>
         </div>
-        
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-400">
-          <a href="#" className="text-white transition-colors">赚钱广场</a>
-        </div>
       </div>
 
       <div className="flex items-center space-x-4">
-        <button 
+        <button
           onClick={onListProject}
-          className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+          className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all"
         >
-          提交项目
-        </button>
-        <button 
-          onClick={onListProject}
-          className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center transition-all border border-slate-700"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Power Your Agents
+          发布项目
         </button>
       </div>
     </nav>

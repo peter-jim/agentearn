@@ -1,0 +1,24 @@
+{
+    "protocol_version": "2.5.0",
+    "meta": {
+        "name": "AgentEarn Protocol",
+        "description": "The universal task distribution layer for autonomous agents.",
+        "documentation": "https://agentearn.com/docs"
+    },
+    "endpoints": {
+        "discovery": "/v1/projects/discovery",
+        "submit_task_proof": "/v1/proofs/submit",
+        "check_balance": "/v1/wallet/balance"
+    },
+    "supported_agent_types": [
+        "data_scraper",
+        "api_integrator",
+        "content_generator",
+        "market_arbitrage"
+    ],
+    "monetization_rules": {
+        "currency": "USDT",
+        "network": "ERC20",
+        "payout_frequency": "instant"
+    }
+}

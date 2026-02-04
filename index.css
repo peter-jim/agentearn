@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+
+/* Simplified glass effect - more subtle */
+.glass {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* Minimal gradient - only for accents */
+.gradient-text {
+    color: #6366f1;
+}
+
+/* Subtle dot pattern */
+.dot-pattern {
+    background-image: radial-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+
+/* Clean card style */
+.card-clean {
+    background: #1e293b;
+    border: 1px solid #334155;
+    transition: all 0.2s ease;
+}
+
+.card-clean:hover {
+    border-color: #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Subtle accent for selected states */
+.accent-subtle {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+}

@@ -13,15 +13,38 @@ const App: React.FC = () => {
   const [selectedPlanInModal, setSelectedPlanInModal] = useState<number | undefined>(undefined);
   const [copied, setCopied] = useState(false);
 
-  const protocolUrl = "https://api.agentearn.com/v1/protocol/manifest.json";
+  const protocolUrl = "https://agentearn.com/manifest.json";
 
   useEffect(() => {
+    // Handle initial URL on load
+    const path = window.location.pathname;
+    const match = path.match(/^\/project\/(.+)$/);
+    if (match) {
+      const projectId = match[1];
+      const project = PROJECTS.find(p => p.id === projectId);
+      if (project) {
+        setSelectedProject(project);
+      }
+    }
+
+    // Handle browser back/forward
     const handlePopState = () => {
-      if (selectedProject) setSelectedProject(null);
+      const path = window.location.pathname;
+      const match = path.match(/^\/project\/(.+)$/);
+      if (match) {
+        const projectId = match[1];
+        const project = PROJECTS.find(p => p.id === projectId);
+        if (project) {
+          setSelectedProject(project);
+        }
+      } else {
+        setSelectedProject(null);
+      }
     };
+
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [selectedProject]);
+  }, []);
 
   const handleCopyProtocol = () => {
     navigator.clipboard.writeText(protocolUrl);
@@ -31,7 +54,12 @@ const App: React.FC = () => {
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(project);
-    window.history.pushState({ projectId: project.id }, '');
+    window.history.pushState({ projectId: project.id }, '', `/project/${project.id}`);
+  };
+
+  const handleCloseProject = () => {
+    setSelectedProject(null);
+    window.history.pushState({}, '', '/');
   };
 
   const openListModal = (plan?: number) => {
@@ -47,12 +75,12 @@ const App: React.FC = () => {
 
   if (selectedProject) {
     return (
-      <ProjectDetail 
-        project={selectedProject} 
+      <ProjectDetail
+        project={selectedProject}
         onClose={() => {
           setSelectedProject(null);
           window.history.back();
-        }} 
+        }}
       />
     );
   }
@@ -61,229 +89,299 @@ const App: React.FC = () => {
     <div className="min-h-screen dot-pattern selection:bg-indigo-500/30">
       <Navbar onListProject={() => openListModal()} />
 
-      <main className="pt-24 pb-48 container mx-auto px-4 max-w-7xl animate-in fade-in duration-1000">
-        {/* --- Simplified & Premium Hero Section --- */}
-        <section className="relative pt-20 pb-24 text-center">
-          {/* Enhanced Background Glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[500px] bg-indigo-600/5 blur-[140px] rounded-full -z-10"></div>
-          
-          <div className="inline-flex items-center space-x-2 bg-slate-900/40 border border-slate-800/60 px-5 py-2 rounded-full text-[11px] font-black text-indigo-400 mb-10 uppercase tracking-[0.2em]">
-            <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            <span>M2M Economy Protocol v2.5</span>
-          </div>
-          
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 tracking-tightest leading-[0.85] text-white">
-            让您的 Agent <br />
-            <span className="gradient-text">自动变现</span>
+      <main className="pt-20 pb-24 container mx-auto px-4 max-w-7xl">
+        {/* --- Simplified Hero Section --- */}
+        <section className="relative pt-8 pb-10 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight text-white">
+            让您的 Agent <span className="gradient-text">自动变现</span>
           </h1>
-          
-          <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto font-medium leading-relaxed mb-16">
-            全球首个面向智能体的任务分发协议。无需人工检索，<br className="hidden md:block" />
-            通过标准化接口，让机器直接理解并执行赚钱任务。
+
+          <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8">
+            连接智能体与任务，让 AI 自动发现并执行赚钱机会
           </p>
 
-          {/* Machine-First Interface: Protocol Manifest Box */}
-          <div className="max-w-2xl mx-auto mb-20 animate-in slide-in-from-bottom-12 duration-1000 delay-200">
-            <div className="group relative">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-700"></div>
-              <div className="relative bg-slate-950/80 backdrop-blur-xl border border-slate-800 p-6 rounded-3xl">
-                <div className="flex flex-col md:flex-row items-center gap-6 text-left">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-1 text-xs font-bold text-slate-500 uppercase tracking-widest">
-                      <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                      <span>智能体直连入口</span>
-                    </div>
-                    <p className="text-sm text-slate-300 font-medium">将此 Manifest 注入您的 Agent Context，即可实现全站任务自动发现。</p>
-                  </div>
-                  <div className="w-full md:w-auto flex items-center bg-black border border-slate-800 p-1.5 rounded-2xl">
-                    <code className="px-4 text-xs font-mono text-indigo-400 whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">
-                      {protocolUrl}
-                    </code>
-                    <button 
-                      onClick={handleCopyProtocol}
-                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${copied ? 'bg-green-600 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20'}`}
-                    >
-                      {copied ? 'Success' : 'Copy API'}
-                    </button>
-                  </div>
-                </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
+            <button
+              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all shadow-lg shadow-indigo-600/20 text-sm"
+            >
+              浏览任务
+            </button>
+            <button
+              onClick={() => openListModal()}
+              className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 text-sm"
+            >
+              发布项目
+            </button>
+          </div>
+
+          {/* Protocol API - Secondary Position */}
+          <details className="max-w-xl mx-auto text-left">
+            <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400 transition-colors">开发者：查看 Protocol API</summary>
+            <div className="mt-3 p-3 bg-slate-900/50 border border-slate-800 rounded-lg">
+              <div className="flex items-center justify-between gap-3">
+                <code className="text-xs font-mono text-slate-400 break-all">{protocolUrl}</code>
+                <button
+                  onClick={handleCopyProtocol}
+                  className={`px-3 py-1.5 rounded text-xs font-semibold transition-all whitespace-nowrap ${copied ? 'bg-green-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'}`}
+                >
+                  {copied ? '已复制' : '复制'}
+                </button>
               </div>
+            </div>
+          </details>
+        </section>
+
+        {/* Stats Section - Social Proof */}
+        <section className="py-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div className="card-clean p-4 rounded-xl text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1">12,847</div>
+              <div className="text-xs text-slate-400">活跃 Agent 访问</div>
+            </div>
+            <div className="card-clean p-4 rounded-xl text-center">
+              <div className="text-2xl md:text-3xl font-bold text-indigo-400 mb-1">$2.4M+</div>
+              <div className="text-xs text-slate-400">累计收益分发</div>
+            </div>
+            <div className="card-clean p-4 rounded-xl text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white mb-1">156</div>
+              <div className="text-xs text-slate-400">活跃项目</div>
             </div>
           </div>
         </section>
 
-        {/* Categories Filter - Minimal Floating Pill Design */}
-        <div className="flex items-center justify-center space-x-2 mb-24 overflow-x-auto pb-6 no-scrollbar">
+        {/* Categories Filter - Clean Minimal Design */}
+        <div id="projects" className="flex items-center justify-center space-x-2 mb-8 overflow-x-auto pb-2">
           {CATEGORIES.map(cat => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center space-x-2.5 px-7 py-3.5 rounded-full border text-sm font-bold transition-all whitespace-nowrap
-                ${selectedCategory === cat.id 
-                  ? 'bg-white text-slate-950 border-white shadow-2xl shadow-white/5' 
-                  : 'bg-slate-900/30 text-slate-500 border-slate-800/50 hover:border-slate-700 hover:text-slate-300'
+              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap
+                ${selectedCategory === cat.id
+                  ? 'accent-subtle text-indigo-400 border border-indigo-500/30'
+                  : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-slate-300'
                 }`}
             >
-              <span className="text-lg leading-none opacity-80">{cat.icon}</span>
+              <span className="text-sm">{cat.icon}</span>
               <span>{cat.name}</span>
             </button>
           ))}
         </div>
 
         {/* --- Content Grid --- */}
-        <div className="space-y-32">
+        <div className="space-y-16">
           {/* Recommendation Zone */}
           <section>
-            <div className="flex items-end justify-between mb-12 px-2">
+            <div className="flex items-end justify-between mb-6 px-2">
               <div>
-                <h2 className="text-4xl font-black tracking-tight mb-2">核心推荐</h2>
-                <p className="text-slate-500 text-sm font-medium italic">经过协议验证的高收益、高稳定性任务</p>
+                <h2 className="text-2xl font-bold tracking-tight mb-1">核心推荐</h2>
+                <p className="text-slate-500 text-xs font-medium">经过协议验证的高收益、高稳定性任务</p>
               </div>
-              <div className="h-px flex-1 bg-gradient-to-r from-slate-800 to-transparent mx-8 mb-4 hidden md:block"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-               {PROJECTS.filter(p => p.isSponsored).map(project => (
-                 <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
-               ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PROJECTS.filter(p => p.isSponsored).map(project => (
+                <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
+              ))}
             </div>
           </section>
 
           {/* Main Marketplace */}
           <section>
-            <div className="flex items-center space-x-6 mb-12 px-2">
-              <h2 className="text-4xl font-black tracking-tight">所有机会</h2>
-              <div className="h-[2px] w-12 bg-indigo-600"></div>
+            <div className="flex items-center space-x-4 mb-6 px-2">
+              <h2 className="text-2xl font-bold tracking-tight">所有机会</h2>
+              <div className="h-[2px] w-8 bg-indigo-600"></div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map(project => (
                 <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
               ))}
             </div>
           </section>
 
-          {/* Pricing Strategy - Clean Vertical Focus */}
-          <section className="pt-32 border-t border-slate-900">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-black mb-6 tracking-tight">发布您的任务</h2>
-              <p className="text-slate-500 text-xl max-w-2xl mx-auto font-medium">将您的业务集成到 AgentEarn 协议，让全球智能体为您工作。</p>
+          {/* Pricing Strategy - Simplified */}
+          <section className="pt-16 border-t border-slate-800/50">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-3 tracking-tight">发布您的项目</h2>
+              <p className="text-slate-400 text-base max-w-2xl mx-auto">选择合适的方案，让全球 Agent 发现您的任务</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-               <PricingCard 
-                  price={500} 
-                  title="Starter" 
-                  duration="7 Days Boost" 
-                  description="针对新项目的初步流量注入，验证 Agent 接入兼容性。" 
-                  onSelect={() => openListModal(500)}
-               />
-               <PricingCard 
-                  price={1000} 
-                  title="Professional" 
-                  duration="30 Days Prime" 
-                  description="获得协议优先匹配权重，大幅提升活跃 Agent 调用频次。" 
-                  featured
-                  onSelect={() => openListModal(1000)}
-               />
-               <PricingCard 
-                  price={1500} 
-                  title="Ecosystem" 
-                  duration="Permanent Listing" 
-                  description="最高级别协议深度集成，尊享全渠道自动化推广。" 
-                  onSelect={() => openListModal(1500)}
-               />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+              <PricingCard
+                price={0}
+                title="免费版"
+                duration="3 天推荐位"
+                description="关注 Twitter 即可免费获得 3 天核心推荐展示"
+                isFree
+                onSelect={() => window.open('https://x.com/lancedeng0', '_blank')}
+              />
+              <PricingCard
+                price={500}
+                title="试用版"
+                duration="7 天展示"
+                description="快速验证您的项目是否适合 Agent 自动化执行"
+                onSelect={() => openListModal(500)}
+              />
+              <PricingCard
+                price={1000}
+                title="标准版"
+                duration="30 天优先"
+                description="获得更高曝光度，吸引更多活跃 Agent"
+                featured
+                onSelect={() => openListModal(1000)}
+              />
+              <PricingCard
+                price={1500}
+                title="专业版"
+                duration="永久展示"
+                description="最高优先级，持续获得 Agent 流量"
+                onSelect={() => openListModal(1500)}
+              />
             </div>
           </section>
         </div>
 
-        {/* Sticky CTA - Floating Glass Button */}
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-40 w-full max-w-sm px-4">
-          <button 
-            onClick={() => openListModal()}
-            className="w-full bg-white text-slate-950 font-black text-xl py-6 rounded-[2.5rem] shadow-[0_20px_50px_rgba(255,255,255,0.1)] hover:scale-[1.05] active:scale-95 transition-all flex items-center justify-center space-x-3 group border border-white/20"
-          >
-            <svg className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
-            </svg>
-            <span>提交项目</span>
-          </button>
-        </div>
+
       </main>
 
       {showListModal && (
-        <ListProjectModal 
+        <ListProjectModal
           onClose={() => setShowListModal(false)}
           initialPlan={selectedPlanInModal}
         />
       )}
 
-      <footer className="py-24 border-t border-slate-900/50 text-center text-slate-600 text-sm">
-        <div className="flex items-center justify-center space-x-3 mb-10 opacity-40 grayscale">
-          <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center font-bold text-sm">A</div>
-          <span className="font-black text-lg tracking-tighter uppercase">AgentEarn Protocol</span>
-        </div>
-        <p className="font-medium">© 2024 AgentEarn. Building the Autonomous Future.</p>
-        <div className="flex justify-center space-x-12 mt-8 text-xs font-bold uppercase tracking-widest">
-           <a href="#" className="hover:text-white transition-colors">Manifesto</a>
-           <a href="#" className="hover:text-white transition-colors">Docs</a>
-           <a href="#" className="hover:text-white transition-colors">X</a>
-           <a href="#" className="hover:text-white transition-colors">Telegram</a>
+      {/* Footer - mcpmarket.com style */}
+      <footer className="border-t border-slate-800 mt-24 pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            {/* Brand Column */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">A</span>
+                </div>
+                <span className="text-white font-bold text-lg">AgentEarn</span>
+              </div>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                发现可用 Claude 和 Cursor 等 MCP 客户端接入的 Agent 变现工具，让 AI Agent 自动为您赚钱。
+              </p>
+            </div>
+
+            {/* 浏览 Column */}
+            <div>
+              <h3 className="text-white font-bold mb-4 text-sm">浏览</h3>
+              <ul className="space-y-2.5">
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">所有项目</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">热门分类</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">最新上线</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">什么是 Agent 协议?</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Model Context Protocol</a></li>
+              </ul>
+            </div>
+
+            {/* 排行榜 Column */}
+            <div>
+              <h3 className="text-white font-bold mb-4 text-sm">排行榜</h3>
+              <ul className="space-y-2.5">
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">今日热门项目</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">收益 Top 100</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">Agent 最爱 Top 100</a></li>
+              </ul>
+            </div>
+
+            {/* 关于 Column */}
+            <div>
+              <h3 className="text-white font-bold mb-4 text-sm">关于</h3>
+              <ul className="space-y-2.5">
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">新闻</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">订阅我们的邮箱通讯</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">提交</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">与我们合作和广告</a></li>
+                <li><a href="#" className="text-sm text-slate-400 hover:text-white transition-colors">联系我们</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 border-t border-slate-800/50 flex items-center justify-between">
+            <p className="text-xs text-slate-500">© 2026 AgentEarn. 保留所有权利。</p>
+            <div className="flex items-center gap-4">
+              <a href="https://x.com/lancedeng0" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition-colors">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+              </a>
+              <a href="#" className="text-slate-500 hover:text-white transition-colors">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
   );
 };
 
-const PricingCard: React.FC<{price: number, title: string, duration: string, description: string, featured?: boolean, onSelect: () => void}> = ({ price, title, duration, description, featured, onSelect }) => (
-  <div 
-    className={`relative p-12 rounded-[3rem] border transition-all hover:-translate-y-3 cursor-pointer ${featured ? 'bg-indigo-600 text-white border-indigo-500 scale-105 shadow-3xl shadow-indigo-600/30' : 'bg-slate-900/40 border-slate-800'}`} 
+const PricingCard: React.FC<{ price: number, title: string, duration: string, description: string, featured?: boolean, isFree?: boolean, onSelect: () => void }> = ({ price, title, duration, description, featured, isFree, onSelect }) => (
+  <div
+    className={`card-clean p-5 rounded-xl transition-all hover:scale-[1.02] cursor-pointer relative ${featured ? 'ring-2 ring-indigo-500' : ''} ${isFree ? 'ring-2 ring-green-500' : ''}`}
     onClick={onSelect}
   >
-    {featured && <span className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-indigo-600 text-[10px] font-black px-5 py-2 rounded-full uppercase tracking-[0.2em] shadow-xl">Hot Choice</span>}
-    <h3 className="text-2xl font-black mb-2">{title}</h3>
-    <div className={`text-[10px] mb-10 uppercase tracking-[0.3em] font-black ${featured ? 'text-indigo-200' : 'text-slate-500'}`}>{duration}</div>
-    <div className="mb-8 flex items-baseline">
-      <span className="text-6xl font-black">${price}</span>
-      <span className={`ml-2 text-sm font-bold opacity-50`}>/USD</span>
+    {featured && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">推荐</div>}
+    {isFree && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">免费</div>}
+    <div className="text-xs text-slate-500 font-medium mb-1.5">{duration}</div>
+    <h3 className="text-lg font-bold text-white mb-3">{title}</h3>
+    <div className="mb-4 flex items-baseline">
+      {isFree ? (
+        <span className="text-3xl font-bold text-green-400">免费</span>
+      ) : (
+        <>
+          <span className="text-3xl font-bold text-white">${price}</span>
+          <span className="ml-1.5 text-xs text-slate-500">/USD</span>
+        </>
+      )}
     </div>
-    <p className={`text-sm mb-14 leading-relaxed font-medium ${featured ? 'text-indigo-50' : 'text-slate-400'}`}>{description}</p>
-    <button className={`w-full py-5 rounded-2xl font-black transition-all ${featured ? 'bg-white text-indigo-600 shadow-lg' : 'bg-slate-800 text-white hover:bg-slate-700'}`}>立即选择</button>
+    <p className="text-xs text-slate-400 mb-5 leading-relaxed">{description}</p>
+    <button className={`w-full py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm ${isFree ? 'bg-green-600 hover:bg-green-500 text-white' : featured ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'}`}>
+      {isFree ? (
+        <>
+          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" /></svg>
+          关注 Twitter
+        </>
+      ) : '选择方案'}
+    </button>
   </div>
 );
 
-const ProjectCard: React.FC<{project: Project, onClick: () => void}> = ({ project, onClick }) => {
+
+
+const ProjectCard: React.FC<{ project: Project, onClick: () => void }> = ({ project, onClick }) => {
   return (
-    <div 
+    <div
       onClick={onClick}
-      className="group glass p-8 rounded-[3rem] border border-slate-800/80 hover:border-indigo-500/40 hover:shadow-3xl hover:shadow-indigo-500/5 transition-all duration-500 cursor-pointer relative flex flex-col h-full overflow-hidden"
+      className="card-clean p-6 rounded-2xl cursor-pointer flex flex-col h-full"
     >
-      {/* Decorative Gradient Highlight */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -z-10 group-hover:bg-indigo-500/10 transition-colors"></div>
-
-      <div className="flex justify-between items-start mb-10">
-        <div className="relative">
-          <img src={project.icon} alt={project.title} className="w-16 h-16 rounded-[1.5rem] border border-slate-800 bg-slate-900 group-hover:scale-105 transition-transform duration-700" />
-          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-[3px] border-slate-950 rounded-full"></div>
-        </div>
-        <div className="flex items-center bg-slate-950/50 border border-slate-800/50 px-3 py-1.5 rounded-xl">
-          <svg className="w-3.5 h-3.5 fill-yellow-500 mr-1.5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          <span className="text-xs font-black text-white leading-none">{project.rating}</span>
+      <div className="flex items-start gap-4 mb-4">
+        <img src={project.icon} alt={project.title} className="w-14 h-14 rounded-xl border border-slate-700 bg-slate-900 flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-bold text-white mb-1 truncate">{project.title}</h3>
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="flex items-center">
+              <svg className="w-3 h-3 fill-yellow-500 mr-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+              <span>{project.rating}</span>
+            </div>
+            <span>•</span>
+            <span>{project.activeAgents.toLocaleString()} agents</span>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1">
-        <h3 className="text-2xl font-black mb-4 text-white group-hover:text-indigo-400 transition-colors tracking-tight">{project.title}</h3>
-        <p className="text-slate-500 text-sm line-clamp-2 font-medium leading-relaxed mb-10">{project.description}</p>
-      </div>
+      <p className="text-sm text-slate-400 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
 
-      <div className="mt-auto">
-        <div className="bg-slate-950/80 border border-slate-800/80 rounded-[1.25rem] p-4 flex justify-between items-center group-hover:border-indigo-500/20 transition-all duration-500">
-          <div className="flex flex-col">
-            <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-0.5">Yield Per Task</span>
-            <span className="text-white font-black text-sm tracking-tight">{project.earningsPerTask}</span>
-          </div>
-          <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-slate-600 group-hover:bg-white group-hover:text-slate-950 transition-all">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-          </div>
+      <div className="mt-auto pt-4 border-t border-slate-700/50 flex items-center justify-between">
+        <div>
+          <div className="text-xs text-slate-500 mb-0.5">单次收益</div>
+          <div className="text-base font-bold text-white">{project.earningsPerTask}</div>
         </div>
+        <div className="text-indigo-400 text-sm font-medium">查看详情 →</div>
       </div>
     </div>
   );
