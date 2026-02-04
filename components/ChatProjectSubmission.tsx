@@ -207,64 +207,66 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
 
     return (
         <div className="fixed inset-0 bg-slate-950 z-50 flex">
-            {/* Left Sidebar - Tab Navigation */}
-            <div className="w-48 border-r border-slate-800 bg-slate-900/50 flex flex-col">
-                <div className="p-4 border-b border-slate-800 flex items-center gap-2">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <h3 className="text-white font-bold text-xs truncate">AgentEarn</h3>
-                        <p className="text-xs text-slate-500 truncate">助手</p>
-                    </div>
-                </div>
-
-                {/* Tab Buttons */}
-                <div className="flex-1 p-3 space-y-2">
-                    <button
-                        onClick={() => setActiveTab('chat')}
-                        className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'chat'
-                                ? 'bg-indigo-600 text-white shadow-lg'
-                                : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
-                            }`}
-                    >
-                        <div className="flex items-center gap-2">
-                            <span className="text-base">💬</span>
-                            <span>聊天</span>
+            {/* Left Sidebar - Tab Navigation (hidden when project detail is shown) */}
+            {!(activeTab === 'projects' && selectedProject) && (
+                <div className="w-48 border-r border-slate-800 bg-slate-900/50 flex flex-col">
+                    <div className="p-4 border-b border-slate-800 flex items-center gap-2">
+                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
                         </div>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('projects')}
-                        className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'projects'
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-white font-bold text-xs truncate">AgentEarn</h3>
+                            <p className="text-xs text-slate-500 truncate">助手</p>
+                        </div>
+                    </div>
+
+                    {/* Tab Buttons */}
+                    <div className="flex-1 p-3 space-y-2">
+                        <button
+                            onClick={() => setActiveTab('chat')}
+                            className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'chat'
                                 ? 'bg-indigo-600 text-white shadow-lg'
                                 : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
-                            }`}
-                    >
-                        <div className="flex items-center gap-2">
-                            <span className="text-base">📦</span>
-                            <div className="flex-1">
-                                <div>我的项目</div>
-                                <div className="text-xs opacity-70">({existingProjects.length})</div>
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <span className="text-base">💬</span>
+                                <span>聊天</span>
                             </div>
-                        </div>
-                    </button>
-                </div>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('projects')}
+                            className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'projects'
+                                ? 'bg-indigo-600 text-white shadow-lg'
+                                : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <span className="text-base">📦</span>
+                                <div className="flex-1">
+                                    <div>我的项目</div>
+                                    <div className="text-xs opacity-70">({existingProjects.length})</div>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
 
-                {/* Close Button */}
-                <div className="p-3 border-t border-slate-800">
-                    <button
-                        onClick={onClose}
-                        className="w-full px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        关闭
-                    </button>
+                    {/* Close Button */}
+                    <div className="p-3 border-t border-slate-800">
+                        <button
+                            onClick={onClose}
+                            className="w-full px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            关闭
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Main Content Area */}
             <div className="flex-1 flex">
@@ -370,8 +372,21 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
                     <>
                         {/* Projects Grid */}
                         <div className="flex-1 overflow-y-auto p-6 bg-slate-950">
-                            <div className="max-w-6xl mx-auto">
-                                <h3 className="text-xl font-bold text-white mb-6">我的项目</h3>
+                            <div className={selectedProject ? "max-w-full mx-auto px-4" : "max-w-6xl mx-auto"}>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl font-bold text-white">我的项目</h3>
+                                    {selectedProject && (
+                                        <button
+                                            onClick={() => setSelectedProject(null)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                            </svg>
+                                            返回列表
+                                        </button>
+                                    )}
+                                </div>
                                 {existingProjects.length === 0 ? (
                                     <div className="text-center py-20">
                                         <svg className="w-16 h-16 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -392,8 +407,8 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
                                                 key={project.id}
                                                 onClick={() => setSelectedProject(project)}
                                                 className={`bg-slate-900/50 rounded-xl p-4 border cursor-pointer transition-all hover:border-indigo-500 ${selectedProject?.id === project.id
-                                                        ? 'border-indigo-500 ring-2 ring-indigo-500/20'
-                                                        : 'border-slate-800'
+                                                    ? 'border-indigo-500 ring-2 ring-indigo-500/20'
+                                                    : 'border-slate-800'
                                                     }`}
                                             >
                                                 <div className="flex items-start gap-3 mb-3">
