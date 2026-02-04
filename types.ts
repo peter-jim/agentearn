@@ -14,7 +14,25 @@ export interface ProjectReview {
   rating: number;
   comment: string;
   date: string;
+  helpfulCount?: number;
+  unhelpfulCount?: number;
+  verified?: boolean;
 }
+
+export interface ReviewStats {
+  averageRating: number;
+  totalReviews: number;
+  ratingDistribution: {
+    5: number;
+    4: number;
+    3: number;
+    2: number;
+    1: number;
+  };
+}
+
+export type ReviewSortOption = 'newest' | 'helpful' | 'highest' | 'lowest';
+export type ReviewFilterOption = 'all' | '5' | '4' | '3' | '2' | '1';
 
 export interface ExternalLink {
   label: string;

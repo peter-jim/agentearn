@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { Project, ExternalLink } from '../types';
+import { Project, ExternalLink, ProjectReview } from '../types';
+import ReviewForm from './ReviewForm';
+import StarRating from './StarRating';
 
 interface ProjectDetailProps {
   project: Project;
@@ -10,6 +12,9 @@ interface ProjectDetailProps {
 const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'readme' | 'api' | 'reviews'>('readme');
+  const [reviews, setReviews] = useState<ProjectReview[]>(project.reviews);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [votedReviews, setVotedReviews] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -22,17 +27,46 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleReviewSubmit = (newReview: Omit<ProjectReview, 'id' | 'date' | 'avatar'>) => {
+    const review: ProjectReview = {
+      ...newReview,
+      id: `r${Date.now()}`,
+      date: new Date().toISOString().split('T')[0],
+      avatar: `https://i.pravatar.cc/150?u=${Date.now()}`
+    };
+
+    setReviews([review, ...reviews]);
+    setShowReviewForm(false);
+  };
+
+  const handleVote = (reviewId: string, type: 'helpful' | 'unhelpful') => {
+    if (votedReviews.has(reviewId)) return;
+
+    setReviews(reviews.map(review => {
+      if (review.id === reviewId) {
+        return {
+          ...review,
+          helpfulCount: type === 'helpful' ? (review.helpfulCount || 0) + 1 : review.helpfulCount,
+          unhelpfulCount: type === 'unhelpful' ? (review.unhelpfulCount || 0) + 1 : review.unhelpfulCount
+        };
+      }
+      return review;
+    }));
+
+    setVotedReviews(new Set([...votedReviews, reviewId]));
+  };
+
   const renderIcon = (type: ExternalLink['iconType']) => {
     switch (type) {
       case 'web': return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>;
       case 'docs': return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>;
-      case 'discord': return <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.579.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" /></svg>;
+      case 'discord': return <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.579.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0 a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z" /></svg>;
       default: return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>;
     }
   };
 
   return (
-    <div className="absolute inset-0 z-50 bg-slate-950 min-h-screen">
+    <div className="min-h-screen bg-slate-950">
       {/* Main Navbar */}
       <div className="sticky top-0 z-30 glass border-b border-slate-800 px-6 py-4 backdrop-blur-md bg-slate-950/90">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -44,8 +78,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
+            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             发布项目
           </button>
         </div>
@@ -183,24 +216,90 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
 
             {activeTab === 'reviews' && (
               <section>
-                <h2 className="text-lg font-bold mb-3">Agent Reviews</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold flex items-center">
+                    <span className="w-1 h-4 bg-indigo-500 rounded-full mr-2"></span>
+                    Agent Reviews
+                  </h2>
+                  {!showReviewForm && (
+                    <button
+                      onClick={() => setShowReviewForm(true)}
+                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                      写评价
+                    </button>
+                  )}
+                </div>
+
+                {/* Review Form */}
+                {showReviewForm && (
+                  <div className="mb-6">
+                    <ReviewForm
+                      onSubmit={handleReviewSubmit}
+                      onCancel={() => setShowReviewForm(false)}
+                    />
+                  </div>
+                )}
+
+                {/* Reviews List */}
                 <div className="space-y-3">
-                  {project.reviews.map(review => (
+                  {reviews.map(review => (
                     <div key={review.id} className="bg-slate-900/20 p-5 rounded-xl border border-slate-800">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
                           <img src={review.avatar} className="w-10 h-10 rounded-xl" alt={review.user} />
                           <div>
-                            <p className="font-bold text-white text-sm">{review.user}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-bold text-white text-sm">{review.user}</p>
+                              {review.verified && (
+                                <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-1.5 py-0.5 rounded text-xs font-bold">
+                                  ✓ 认证
+                                </span>
+                              )}
+                            </div>
                             <p className="text-xs text-slate-500">{review.date}</p>
                           </div>
                         </div>
-                        <div className="flex items-center text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">
-                          <span className="font-bold text-sm mr-1">{review.rating}</span>
-                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                        <div className="flex items-center gap-1">
+                          <StarRating rating={review.rating} readonly size="sm" />
+                          <span className="ml-1 font-bold text-sm text-yellow-400">{review.rating}</span>
                         </div>
                       </div>
-                      <p className="text-sm text-slate-400 leading-relaxed">{review.comment}</p>
+                      <p className="text-sm text-slate-300 leading-relaxed mb-3">{review.comment}</p>
+
+                      {/* Helpful Buttons */}
+                      <div className="flex items-center gap-3 pt-3 border-t border-slate-800/50">
+                        <span className="text-xs text-slate-500">这条评价有用吗？</span>
+                        <button
+                          onClick={() => handleVote(review.id, 'helpful')}
+                          disabled={votedReviews.has(review.id)}
+                          className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${votedReviews.has(review.id)
+                              ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                              : 'bg-slate-900/50 text-slate-400 hover:bg-green-500/10 hover:text-green-400 border border-slate-800 hover:border-green-500/30'
+                            }`}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                          </svg>
+                          有用 {review.helpfulCount ? `(${review.helpfulCount})` : ''}
+                        </button>
+                        <button
+                          onClick={() => handleVote(review.id, 'unhelpful')}
+                          disabled={votedReviews.has(review.id)}
+                          className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${votedReviews.has(review.id)
+                              ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                              : 'bg-slate-900/50 text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-slate-800 hover:border-red-500/30'
+                            }`}
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.096c.5 0 .905-.405.905-.904 0-.715.211-1.413.608-2.008L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5" />
+                          </svg>
+                          无用 {review.unhelpfulCount ? `(${review.unhelpfulCount})` : ''}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -256,7 +355,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
                 <span className="text-white font-bold text-lg">AgentEarn</span>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed">
-                发现可用 Claude 和 Cursor 等 MCP 客户端接入的 Agent 变现工具，让 AI Agent 自动为您赚钱。
+                发现可用 Claude 和 Cursor 等 MCP 客户端接入的 Agent 变现工具,让 AI Agent 自动为您赚钱。
               </p>
             </div>
 

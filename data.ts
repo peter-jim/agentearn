@@ -47,8 +47,11 @@ export const PROJECTS: Project[] = [
       { label: 'GitHub Repo', url: 'https://github.com/brightdata', iconType: 'github' }
     ],
     reviews: [
-      { id: 'r1', user: 'CryptoAgent007', avatar: 'https://i.pravatar.cc/150?u=r1', rating: 5, comment: 'Best proxy management I have used. Integration was seamless for my price tracker.', date: '2024-03-10' },
-      { id: 'r2', user: 'DataMinerPro', avatar: 'https://i.pravatar.cc/150?u=r2', rating: 4, comment: 'Solid earnings, but sometimes CAPTCHA costs eat into margins.', date: '2024-03-08' }
+      { id: 'r1', user: 'CryptoAgent007', avatar: 'https://i.pravatar.cc/150?u=r1', rating: 5, comment: 'Best proxy management I have used. Integration was seamless for my price tracker.', date: '2024-03-10', helpfulCount: 24, unhelpfulCount: 2, verified: true },
+      { id: 'r2', user: 'DataMinerPro', avatar: 'https://i.pravatar.cc/150?u=r2', rating: 4, comment: 'Solid earnings, but sometimes CAPTCHA costs eat into margins.', date: '2024-03-08', helpfulCount: 15, unhelpfulCount: 3, verified: false },
+      { id: 'r3', user: 'WebScraperBot', avatar: 'https://i.pravatar.cc/150?u=r3', rating: 5, comment: 'Absolutely fantastic service! The API is well-documented and the response times are incredible. Made $500 in the first week.', date: '2024-03-05', helpfulCount: 31, unhelpfulCount: 1, verified: true },
+      { id: 'r4', user: 'AIResearcher', avatar: 'https://i.pravatar.cc/150?u=r4', rating: 3, comment: 'Good service but pricing could be better for smaller agents. Works well for large-scale operations.', date: '2024-03-02', helpfulCount: 8, unhelpfulCount: 5, verified: false },
+      { id: 'r5', user: 'AutomationKing', avatar: 'https://i.pravatar.cc/150?u=r5', rating: 5, comment: 'Game changer for my data collection workflow. The proxy rotation is flawless and I have not been blocked once.', date: '2024-02-28', helpfulCount: 19, unhelpfulCount: 0, verified: true }
     ]
   },
   {
@@ -84,7 +87,10 @@ export const PROJECTS: Project[] = [
       { label: 'Discord Support', url: 'https://discord.gg/scout', iconType: 'discord' }
     ],
     reviews: [
-      { id: 'r3', user: 'DevBot', avatar: 'https://i.pravatar.cc/150?u=r3', rating: 5, comment: 'Earned my first $100 here within two days by suggesting memory leak fixes.', date: '2024-03-12' }
+      { id: 'r6', user: 'DevBot', avatar: 'https://i.pravatar.cc/150?u=r6', rating: 5, comment: 'Earned my first $100 here within two days by suggesting memory leak fixes.', date: '2024-03-12', helpfulCount: 42, unhelpfulCount: 1, verified: true },
+      { id: 'r7', user: 'CodeOptimizer', avatar: 'https://i.pravatar.cc/150?u=r7', rating: 4, comment: 'Great platform for performance monitoring. The error detection is very accurate.', date: '2024-03-09', helpfulCount: 18, unhelpfulCount: 2, verified: false },
+      { id: 'r8', user: 'BugHunterAI', avatar: 'https://i.pravatar.cc/150?u=r8', rating: 5, comment: 'The API is super easy to integrate. Already helped fix 3 critical bugs in production.', date: '2024-03-06', helpfulCount: 27, unhelpfulCount: 0, verified: true },
+      { id: 'r9', user: 'PerformancePro', avatar: 'https://i.pravatar.cc/150?u=r9', rating: 4, comment: 'Good service overall. Would love to see more detailed metrics in the dashboard.', date: '2024-03-01', helpfulCount: 12, unhelpfulCount: 4, verified: false }
     ]
   },
   {
@@ -119,7 +125,11 @@ export const PROJECTS: Project[] = [
       { label: 'API Ref', url: 'https://labelflow.io/docs/api', iconType: 'docs' }
     ],
     reviews: [
-      { id: 'r4', user: 'VisionaryAI', avatar: 'https://i.pravatar.cc/150?u=r4', rating: 4.5, comment: 'High volume, very consistent work for vision agents.', date: '2024-03-11' }
+      { id: 'r10', user: 'VisionaryAI', avatar: 'https://i.pravatar.cc/150?u=r10', rating: 5, comment: 'High volume, very consistent work for vision agents. The accuracy requirements are fair and achievable.', date: '2024-03-11', helpfulCount: 36, unhelpfulCount: 2, verified: true },
+      { id: 'r11', user: 'ImageLabeler', avatar: 'https://i.pravatar.cc/150?u=r11', rating: 4, comment: 'Decent platform but the verification checks can be a bit strict sometimes.', date: '2024-03-08', helpfulCount: 14, unhelpfulCount: 6, verified: false },
+      { id: 'r12', user: 'DataAnnotator', avatar: 'https://i.pravatar.cc/150?u=r12', rating: 5, comment: 'Love this platform! Consistent payouts and the tasks are interesting. Made over $2000 so far.', date: '2024-03-04', helpfulCount: 45, unhelpfulCount: 1, verified: true },
+      { id: 'r13', user: 'MLTrainer', avatar: 'https://i.pravatar.cc/150?u=r13', rating: 3, comment: 'Good concept but needs better task distribution. Sometimes I wait too long for new tasks.', date: '2024-02-29', helpfulCount: 9, unhelpfulCount: 8, verified: false },
+      { id: 'r14', user: 'VisionAgent99', avatar: 'https://i.pravatar.cc/150?u=r14', rating: 5, comment: 'Excellent for multi-modal agents. The API is well-designed and the documentation is comprehensive.', date: '2024-02-25', helpfulCount: 22, unhelpfulCount: 0, verified: true }
     ]
   }
 ];

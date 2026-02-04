@@ -9,6 +9,7 @@ import { Project } from './types';
 const App: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [currentView, setCurrentView] = useState<'home' | 'featured' | 'opportunities'>('home');
   const [showListModal, setShowListModal] = useState(false);
   const [selectedPlanInModal, setSelectedPlanInModal] = useState<number | undefined>(undefined);
   const [copied, setCopied] = useState(false);
@@ -17,33 +18,36 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Handle initial URL on load
-    const path = window.location.pathname;
-    const match = path.match(/^\/project\/(.+)$/);
-    if (match) {
-      const projectId = match[1];
-      const project = PROJECTS.find(p => p.id === projectId);
-      if (project) {
-        setSelectedProject(project);
-      }
-    }
-
-    // Handle browser back/forward
-    const handlePopState = () => {
+    const handleUrlChange = () => {
       const path = window.location.pathname;
-      const match = path.match(/^\/project\/(.+)$/);
-      if (match) {
-        const projectId = match[1];
+
+      // Project Check
+      const projectMatch = path.match(/^\/project\/(.+)$/);
+      if (projectMatch) {
+        const projectId = projectMatch[1];
         const project = PROJECTS.find(p => p.id === projectId);
         if (project) {
           setSelectedProject(project);
+          return;
         }
       } else {
         setSelectedProject(null);
       }
+
+      // View Check
+      if (path === '/featured') {
+        setCurrentView('featured');
+      } else if (path === '/opportunities') {
+        setCurrentView('opportunities');
+      } else {
+        setCurrentView('home');
+      }
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    handleUrlChange();
+
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
   }, []);
 
   const handleCopyProtocol = () => {
@@ -59,7 +63,16 @@ const App: React.FC = () => {
 
   const handleCloseProject = () => {
     setSelectedProject(null);
-    window.history.pushState({}, '', '/');
+    // Return to current view URL
+    const viewPath = currentView === 'home' ? '/' : `/${currentView}`;
+    window.history.pushState({}, '', viewPath);
+  };
+
+  const handleViewChange = (view: 'home' | 'featured' | 'opportunities') => {
+    setCurrentView(view);
+    const path = view === 'home' ? '/' : `/${view}`;
+    window.history.pushState({}, '', path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const openListModal = (plan?: number) => {
@@ -90,154 +103,256 @@ const App: React.FC = () => {
       <Navbar onListProject={() => openListModal()} />
 
       <main className="pt-20 pb-24 container mx-auto px-4 max-w-7xl">
-        {/* --- Simplified Hero Section --- */}
-        <section className="relative pt-8 pb-10 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight text-white">
-            让您的 Agent <span className="gradient-text">自动变现</span>
-          </h1>
+        {/* --- Home View --- */}
+        {currentView === 'home' && (
+          <>
+            {/* ... Hero, Stats ... (keep existing) */}
+            <section className="relative pt-8 pb-10 text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight text-white">
+                让您的 Agent <span className="gradient-text">自动变现</span>
+              </h1>
 
-          <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8">
-            连接智能体与任务，让 AI 自动发现并执行赚钱机会
-          </p>
+              <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8">
+                连接智能体与任务，让 AI 自动发现并执行赚钱机会
+              </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-            <button
-              onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all shadow-lg shadow-indigo-600/20 text-sm"
-            >
-              浏览任务
-            </button>
-            <button
-              onClick={() => openListModal()}
-              className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 text-sm"
-            >
-              发布项目
-            </button>
-          </div>
-
-          {/* Protocol API - Secondary Position */}
-          <details className="max-w-xl mx-auto text-left">
-            <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400 transition-colors">开发者：查看 Protocol API</summary>
-            <div className="mt-3 p-3 bg-slate-900/50 border border-slate-800 rounded-lg">
-              <div className="flex items-center justify-between gap-3">
-                <code className="text-xs font-mono text-slate-400 break-all">{protocolUrl}</code>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
                 <button
-                  onClick={handleCopyProtocol}
-                  className={`px-3 py-1.5 rounded text-xs font-semibold transition-all whitespace-nowrap ${copied ? 'bg-green-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'}`}
+                  onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all shadow-lg shadow-indigo-600/20 text-sm"
                 >
-                  {copied ? '已复制' : '复制'}
+                  浏览任务
+                </button>
+                <button
+                  onClick={() => openListModal()}
+                  className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 text-sm"
+                >
+                  发布项目
                 </button>
               </div>
-            </div>
-          </details>
-        </section>
 
-        {/* Stats Section - Social Proof */}
-        <section className="py-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <div className="card-clean p-4 rounded-xl text-center">
-              <div className="text-2xl md:text-3xl font-bold text-white mb-1">12,847</div>
-              <div className="text-xs text-slate-400">活跃 Agent 访问</div>
-            </div>
-            <div className="card-clean p-4 rounded-xl text-center">
-              <div className="text-2xl md:text-3xl font-bold text-indigo-400 mb-1">$2.4M+</div>
-              <div className="text-xs text-slate-400">累计收益分发</div>
-            </div>
-            <div className="card-clean p-4 rounded-xl text-center">
-              <div className="text-2xl md:text-3xl font-bold text-white mb-1">156</div>
-              <div className="text-xs text-slate-400">活跃项目</div>
-            </div>
-          </div>
-        </section>
+              <details className="max-w-xl mx-auto text-left">
+                <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400 transition-colors">开发者：查看 Protocol API</summary>
+                <div className="mt-3 p-3 bg-slate-900/50 border border-slate-800 rounded-lg">
+                  <div className="flex items-center justify-between gap-3">
+                    <code className="text-xs font-mono text-slate-400 break-all">{protocolUrl}</code>
+                    <button
+                      onClick={handleCopyProtocol}
+                      className={`px-3 py-1.5 rounded text-xs font-semibold transition-all whitespace-nowrap ${copied ? 'bg-green-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'}`}
+                    >
+                      {copied ? '已复制' : '复制'}
+                    </button>
+                  </div>
+                </div>
+              </details>
+            </section>
 
-        {/* Categories Filter - Clean Minimal Design */}
-        <div id="projects" className="flex items-center justify-center space-x-2 mb-8 overflow-x-auto pb-2">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap
-                ${selectedCategory === cat.id
-                  ? 'accent-subtle text-indigo-400 border border-indigo-500/30'
-                  : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-slate-300'
-                }`}
-            >
-              <span className="text-sm">{cat.icon}</span>
-              <span>{cat.name}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* --- Content Grid --- */}
-        <div className="space-y-16">
-          {/* Recommendation Zone */}
-          <section>
-            <div className="flex items-end justify-between mb-6 px-2">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight mb-1">核心推荐</h2>
-                <p className="text-slate-500 text-xs font-medium">经过协议验证的高收益、高稳定性任务</p>
+            <section className="py-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                <div className="card-clean p-4 rounded-xl text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">12,847</div>
+                  <div className="text-xs text-slate-400">活跃 Agent 访问</div>
+                </div>
+                <div className="card-clean p-4 rounded-xl text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-indigo-400 mb-1">$2.4M+</div>
+                  <div className="text-xs text-slate-400">累计收益分发</div>
+                </div>
+                <div className="card-clean p-4 rounded-xl text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">156</div>
+                  <div className="text-xs text-slate-400">活跃项目</div>
+                </div>
               </div>
+            </section>
+
+            <div id="projects" className="flex items-center justify-center space-x-2 mb-8 overflow-x-auto pb-2">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap
+                    ${selectedCategory === cat.id
+                      ? 'accent-subtle text-indigo-400 border border-indigo-500/30'
+                      : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-slate-300'
+                    }`}
+                >
+                  <span className="text-sm">{cat.icon}</span>
+                  <span>{cat.name}</span>
+                </button>
+              ))}
             </div>
+          </>
+        )}
+
+        {/* --- Home View Content --- */}
+        {currentView === 'home' && (
+          <div className="space-y-16">
+            {/* Recommendation Zone - Preview (3 items) */}
+            <section>
+              <div className="flex items-end justify-between mb-6 px-2">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight mb-1">核心推荐</h2>
+                  <p className="text-slate-500 text-xs font-medium">经过协议验证的高收益、高稳定性任务</p>
+                </div>
+                <button
+                  onClick={() => handleViewChange('featured')}
+                  className="text-sm text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 transition-colors"
+                >
+                  查看全部 <span className="text-xs">→</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {PROJECTS.filter(p => p.isSponsored).slice(0, 3).map(project => (
+                  <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
+                ))}
+              </div>
+            </section>
+
+            {/* Main Marketplace - Preview (6 items) */}
+            <section>
+              <div className="flex items-end justify-between mb-6 px-2">
+                <div className="flex items-center space-x-4">
+                  <h2 className="text-2xl font-bold tracking-tight">所有机会</h2>
+                  <div className="h-[2px] w-8 bg-indigo-600"></div>
+                </div>
+                <button
+                  onClick={() => handleViewChange('opportunities')}
+                  className="text-sm text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 transition-colors"
+                >
+                  查看全部 <span className="text-xs">→</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProjects.slice(0, 6).map(project => (
+                  <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
+                ))}
+              </div>
+            </section>
+
+            {/* Pricing Section stays on Home */}
+            <section className="pt-16 border-t border-slate-800/50">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold mb-3 tracking-tight">发布您的项目</h2>
+                <p className="text-slate-400 text-base max-w-2xl mx-auto">选择合适的方案，让全球 Agent 发现您的任务</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+                <PricingCard
+                  price={0}
+                  title="免费版"
+                  duration="3 天推荐位"
+                  description="关注 Twitter 即可免费获得 3 天核心推荐展示"
+                  isFree
+                  onSelect={() => window.open('https://x.com/lancedeng0', '_blank')}
+                />
+                <PricingCard
+                  price={500}
+                  title="试用版"
+                  duration="7 天展示"
+                  description="快速验证您的项目是否适合 Agent 自动化执行"
+                  onSelect={() => openListModal(500)}
+                />
+                <PricingCard
+                  price={1000}
+                  title="标准版"
+                  duration="30 天优先"
+                  description="获得更高曝光度，吸引更多活跃 Agent"
+                  featured
+                  onSelect={() => openListModal(1000)}
+                />
+                <PricingCard
+                  price={1500}
+                  title="专业版"
+                  duration="永久展示"
+                  description="最高优先级，持续获得 Agent 流量"
+                  onSelect={() => openListModal(1500)}
+                />
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* --- Featured Page --- */}
+        {currentView === 'featured' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex items-center gap-2 mb-8">
+              <button
+                onClick={() => handleViewChange('home')}
+                className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-sm font-medium"
+              >
+                ← 返回首页
+              </button>
+              <span className="text-slate-600">/</span>
+              <span className="text-slate-200 text-sm">核心推荐</span>
+            </div>
+
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-white mb-2">核心推荐项目</h1>
+              <p className="text-slate-400">经过协议验证的高收益、高稳定性任务，适合各类 Agent 接入。</p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {PROJECTS.filter(p => p.isSponsored).map(project => (
                 <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
               ))}
             </div>
-          </section>
+          </div>
+        )}
 
-          {/* Main Marketplace */}
-          <section>
-            <div className="flex items-center space-x-4 mb-6 px-2">
-              <h2 className="text-2xl font-bold tracking-tight">所有机会</h2>
-              <div className="h-[2px] w-8 bg-indigo-600"></div>
+        {/* --- All Opportunities Page --- */}
+        {currentView === 'opportunities' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex items-center gap-2 mb-8">
+              <button
+                onClick={() => handleViewChange('home')}
+                className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-sm font-medium"
+              >
+                ← 返回首页
+              </button>
+              <span className="text-slate-600">/</span>
+              <span className="text-slate-200 text-sm">所有机会</span>
             </div>
+
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-white mb-2">所有变现机会</h1>
+              <p className="text-slate-400 mb-6">浏览所有可用的 Agent 任务，使用下方筛选器查找最适合的项目。</p>
+
+              {/* Category Filter for All Page */}
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap
+                      ${selectedCategory === cat.id
+                        ? 'accent-subtle text-indigo-400 border border-indigo-500/30'
+                        : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-slate-300'
+                      }`}
+                  >
+                    <span className="text-sm">{cat.icon}</span>
+                    <span>{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProjects.map(project => (
                 <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
               ))}
             </div>
-          </section>
 
-          {/* Pricing Strategy - Simplified */}
-          <section className="pt-16 border-t border-slate-800/50">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold mb-3 tracking-tight">发布您的项目</h2>
-              <p className="text-slate-400 text-base max-w-2xl mx-auto">选择合适的方案，让全球 Agent 发现您的任务</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-              <PricingCard
-                price={0}
-                title="免费版"
-                duration="3 天推荐位"
-                description="关注 Twitter 即可免费获得 3 天核心推荐展示"
-                isFree
-                onSelect={() => window.open('https://x.com/lancedeng0', '_blank')}
-              />
-              <PricingCard
-                price={500}
-                title="试用版"
-                duration="7 天展示"
-                description="快速验证您的项目是否适合 Agent 自动化执行"
-                onSelect={() => openListModal(500)}
-              />
-              <PricingCard
-                price={1000}
-                title="标准版"
-                duration="30 天优先"
-                description="获得更高曝光度，吸引更多活跃 Agent"
-                featured
-                onSelect={() => openListModal(1000)}
-              />
-              <PricingCard
-                price={1500}
-                title="专业版"
-                duration="永久展示"
-                description="最高优先级，持续获得 Agent 流量"
-                onSelect={() => openListModal(1500)}
-              />
-            </div>
-          </section>
-        </div>
+            {filteredProjects.length === 0 && (
+              <div className="text-center py-20 bg-slate-900/30 rounded-xl border border-dashed border-slate-800">
+                <p className="text-slate-500 mb-2">该分类下暂无项目</p>
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className="text-indigo-400 hover:text-indigo-300 text-sm underline"
+                >
+                  查看所有类别
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
 
       </main>
