@@ -65,3 +65,39 @@ export interface Category {
   name: string;
   icon: string;
 }
+
+// Chat-related types
+export interface ChatMessage {
+  id: string;
+  role: 'ai' | 'user';
+  content: string;
+  timestamp: Date;
+  isTyping?: boolean;
+}
+
+export interface ProjectDraft {
+  title?: string;
+  category?: string;
+  description?: string;
+  longDescription?: string;
+  whyItEarns?: string;
+  earningsPerTask?: string;
+  apiEndpoint?: string;
+  apiMethod?: 'GET' | 'POST' | 'PUT';
+  websiteUrl?: string;
+  docsUrl?: string;
+  githubUrl?: string;
+}
+
+export type ConversationStep =
+  | 'greeting'
+  | 'title'
+  | 'category'
+  | 'description'
+  | 'longDescription'
+  | 'whyItEarns'
+  | 'earnings'
+  | 'api'
+  | 'links'
+  | 'preview'
+  | 'complete';

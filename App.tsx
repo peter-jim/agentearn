@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ProjectDetail from './components/ProjectDetail';
-import ListProjectModal from './components/ListProjectModal';
+import ChatProjectSubmission from './components/ChatProjectSubmission';
 import { PROJECTS, CATEGORIES } from './data';
 import { Project } from './types';
 
@@ -10,8 +10,8 @@ const App: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [currentView, setCurrentView] = useState<'home' | 'featured' | 'opportunities'>('home');
-  const [showListModal, setShowListModal] = useState(false);
-  const [selectedPlanInModal, setSelectedPlanInModal] = useState<number | undefined>(undefined);
+  const [showChatSubmission, setShowChatSubmission] = useState(false);
+  const [projects, setProjects] = useState<Project[]>(PROJECTS);
   const [copied, setCopied] = useState(false);
 
   const protocolUrl = "https://agentearn.com/manifest.json";
@@ -75,16 +75,15 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const openListModal = (plan?: number) => {
-    setSelectedPlanInModal(plan);
-    setShowListModal(true);
+  const handleNewProject = (project: Project) => {
+    setProjects([project, ...projects]);
   };
 
   const filteredProjects = useMemo(() => {
-    return PROJECTS.filter(p => {
+    return projects.filter(p => {
       return selectedCategory === 'all' || p.category === selectedCategory;
     });
-  }, [selectedCategory]);
+  }, [selectedCategory, projects]);
 
   if (selectedProject) {
     return (
@@ -100,7 +99,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen dot-pattern selection:bg-indigo-500/30">
-      <Navbar onListProject={() => openListModal()} />
+      <Navbar onListProject={() => setShowChatSubmission(true)} />
 
       <main className="pt-20 pb-24 container mx-auto px-4 max-w-7xl">
         {/* --- Home View --- */}
@@ -124,7 +123,7 @@ const App: React.FC = () => {
                   浏览任务
                 </button>
                 <button
-                  onClick={() => openListModal()}
+                  onClick={() => setShowChatSubmission(true)}
                   className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 text-sm"
                 >
                   发布项目
@@ -201,7 +200,7 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {PROJECTS.filter(p => p.isSponsored).slice(0, 3).map(project => (
+                {projects.filter(p => p.isSponsored).slice(0, 3).map(project => (
                   <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
                 ))}
               </div>
@@ -248,7 +247,7 @@ const App: React.FC = () => {
                   title="试用版"
                   duration="7 天展示"
                   description="快速验证您的项目是否适合 Agent 自动化执行"
-                  onSelect={() => openListModal(500)}
+                  onSelect={() => setShowChatSubmission(true)}
                 />
                 <PricingCard
                   price={1000}
@@ -256,14 +255,14 @@ const App: React.FC = () => {
                   duration="30 天优先"
                   description="获得更高曝光度，吸引更多活跃 Agent"
                   featured
-                  onSelect={() => openListModal(1000)}
+                  onSelect={() => setShowChatSubmission(true)}
                 />
                 <PricingCard
                   price={1500}
                   title="专业版"
                   duration="永久展示"
                   description="最高优先级，持续获得 Agent 流量"
-                  onSelect={() => openListModal(1500)}
+                  onSelect={() => setShowChatSubmission(true)}
                 />
               </div>
             </section>
@@ -290,7 +289,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {PROJECTS.filter(p => p.isSponsored).map(project => (
+              {projects.filter(p => p.isSponsored).map(project => (
                 <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
               ))}
             </div>
@@ -357,10 +356,10 @@ const App: React.FC = () => {
 
       </main>
 
-      {showListModal && (
-        <ListProjectModal
-          onClose={() => setShowListModal(false)}
-          initialPlan={selectedPlanInModal}
+      {showChatSubmission && (
+        <ChatProjectSubmission
+          onClose={() => setShowChatSubmission(false)}
+          onSubmit={handleNewProject}
         />
       )}
 
