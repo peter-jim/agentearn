@@ -3,6 +3,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ProjectDetail from './components/ProjectDetail';
 import ChatProjectSubmission from './components/ChatProjectSubmission';
+import { AnimatedNumber } from './components/AnimatedNumber';
+import { FloatingParticles } from './components/FloatingParticles';
+import { createRipple } from './utils/ripple';
 import { PROJECTS, CATEGORIES } from './data';
 import { Project } from './types';
 
@@ -101,80 +104,106 @@ const App: React.FC = () => {
     <div className="min-h-screen dot-pattern selection:bg-indigo-500/30">
       <Navbar onListProject={() => setShowChatSubmission(true)} />
 
-      <main className="pt-20 pb-24 container mx-auto px-4 max-w-7xl">
+      <main className="relative pt-20 pb-24 container mx-auto px-4 max-w-7xl" style={{ zIndex: 2 }}>
         {/* --- Home View --- */}
         {currentView === 'home' && (
           <>
-            {/* ... Hero, Stats ... (keep existing) */}
-            <section className="relative pt-8 pb-10 text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 tracking-tight text-white">
-                让您的 Agent <span className="gradient-text">自动变现</span>
-              </h1>
-
-              <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-8">
-                连接智能体与任务，让 AI 自动发现并执行赚钱机会
-              </p>
-
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
-                <button
-                  onClick={() => document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all shadow-lg shadow-indigo-600/20 text-sm"
-                >
-                  浏览任务
-                </button>
-                <button
-                  onClick={() => setShowChatSubmission(true)}
-                  className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all border border-slate-700 text-sm"
-                >
-                  发布项目
-                </button>
+            {/* Hero Section - Enhanced with Particles */}
+            <section className="relative pt-16 pb-16 text-center overflow-hidden">
+              {/* Particles only in hero section */}
+              <div className="absolute inset-0 -mx-4" style={{ height: '100%' }}>
+                <FloatingParticles count={20} />
               </div>
+              <div className="relative" style={{ zIndex: 2 }}>
+                <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white leading-tight">
+                  让您的 Agent <span className="gradient-text">自动变现</span>
+                </h1>
 
-              <details className="max-w-xl mx-auto text-left">
-                <summary className="cursor-pointer text-xs text-slate-500 hover:text-slate-400 transition-colors">开发者：查看 Protocol API</summary>
-                <div className="mt-3 p-3 bg-slate-900/50 border border-slate-800 rounded-lg">
-                  <div className="flex items-center justify-between gap-3">
-                    <code className="text-xs font-mono text-slate-400 break-all">{protocolUrl}</code>
-                    <button
-                      onClick={handleCopyProtocol}
-                      className={`px-3 py-1.5 rounded text-xs font-semibold transition-all whitespace-nowrap ${copied ? 'bg-green-600 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'}`}
-                    >
-                      {copied ? '已复制' : '复制'}
-                    </button>
+                <p className="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed mb-12">
+                  连接智能体与任务,让 AI 自动发现并执行赚钱机会
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                  <button
+                    onClick={(e) => {
+                      createRipple(e);
+                      document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="px-8 py-3.5 bg-gradient-to-r from-wealth-light to-wealth-DEFAULT hover:from-wealth-light hover:to-wealth-dark text-slate-900 font-bold rounded-full transition-all shadow-lg shadow-wealth-DEFAULT/30 text-base hover:shadow-wealth-DEFAULT/50 hover:scale-105"
+                  >
+                    浏览任务
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      createRipple(e);
+                      setShowChatSubmission(true);
+                    }}
+                    className="px-8 py-3.5 glass text-white rounded-full font-semibold transition-all border border-white/20 text-base hover:bg-white/10 hover:scale-105"
+                  >
+                    发布项目
+                  </button>
+                </div>
+
+                <details className="max-w-2xl mx-auto text-left">
+                  <summary className="cursor-pointer text-sm text-slate-400 hover:text-slate-300 transition-colors text-center">开发者：查看 Protocol API</summary>
+                  <div className="mt-4 p-4 glass rounded-2xl">
+                    <div className="flex items-center justify-between gap-3">
+                      <code className="text-sm font-mono text-slate-300 break-all">{protocolUrl}</code>
+                      <button
+                        onClick={(e) => {
+                          createRipple(e);
+                          handleCopyProtocol();
+                        }}
+                        className={`px-4 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${copied ? 'bg-wealth-dark text-white' : 'glass hover:bg-white/10'}`}
+                      >
+                        {copied ? '已复制' : '复制'}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </details>
+                </details>
+              </div>
             </section>
 
-            <section className="py-6 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                <div className="card-clean p-4 rounded-xl text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">12,847</div>
-                  <div className="text-xs text-slate-400">活跃 Agent 访问</div>
+            {/* Stats Section - With Animated Numbers */}
+            <section className="py-12 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div className="card-clean p-8 rounded-3xl text-center group">
+                  <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                    <AnimatedNumber value={12847} />
+                  </div>
+                  <div className="text-sm text-slate-400">活跃 Agent 访问</div>
                 </div>
-                <div className="card-clean p-4 rounded-xl text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-indigo-400 mb-1">$2.4M+</div>
-                  <div className="text-xs text-slate-400">累计收益分发</div>
+                <div className="card-clean p-8 rounded-3xl text-center group animate-glow-pulse">
+                  <div className="text-4xl md:text-5xl font-bold text-wealth-light mb-2 pb-1">
+                    <AnimatedNumber value={2.4} decimals={1} prefix="$" suffix="M+" />
+                  </div>
+                  <div className="text-sm text-emerald-400 font-medium">累计收益分发</div>
                 </div>
-                <div className="card-clean p-4 rounded-xl text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">156</div>
-                  <div className="text-xs text-slate-400">活跃项目</div>
+                <div className="card-clean p-8 rounded-3xl text-center group">
+                  <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                    <AnimatedNumber value={156} />
+                  </div>
+                  <div className="text-sm text-slate-400">活跃项目</div>
                 </div>
               </div>
             </section>
 
-            <div id="projects" className="flex items-center justify-center space-x-2 mb-8 overflow-x-auto pb-2">
+            {/* Category Pills - Enhanced */}
+            <div id="projects" className="flex items-center justify-center gap-3 mb-12 overflow-x-auto pb-2">
               {CATEGORIES.map(cat => (
                 <button
                   key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap
+                  onClick={(e) => {
+                    createRipple(e);
+                    setSelectedCategory(cat.id);
+                  }}
+                  className={`flex items-center space-x-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap hover:scale-105
                     ${selectedCategory === cat.id
-                      ? 'accent-subtle text-indigo-400 border border-indigo-500/30'
-                      : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-slate-300'
+                      ? 'accent-subtle text-wealth-light border-wealth-light/30'
+                      : 'glass text-slate-300 hover:bg-white/10'
                     }`}
                 >
-                  <span className="text-sm">{cat.icon}</span>
+                  <span className="text-base">{cat.icon}</span>
                   <span>{cat.name}</span>
                 </button>
               ))}
@@ -184,52 +213,64 @@ const App: React.FC = () => {
 
         {/* --- Home View Content --- */}
         {currentView === 'home' && (
-          <div className="space-y-16">
+          <div className="space-y-10">
             {/* Recommendation Zone - Preview (3 items) */}
-            <section>
-              <div className="flex items-end justify-between mb-6 px-2">
+            {/* Featured Section - Enhanced */}
+            <section className="mb-10">
+              <div className="flex items-end justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight mb-1">核心推荐</h2>
-                  <p className="text-slate-500 text-xs font-medium">经过协议验证的高收益、高稳定性任务</p>
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">核心推荐</h2>
+                  <p className="text-slate-400 text-base">经过协议验证的高收益、高稳定性任务</p>
                 </div>
                 <button
-                  onClick={() => handleViewChange('featured')}
-                  className="text-sm text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 transition-colors"
+                  onClick={(e) => {
+                    createRipple(e);
+                    handleViewChange('featured');
+                  }}
+                  className="text-base text-wealth-DEFAULT hover:text-wealth-light font-medium flex items-center gap-2 transition-all hover:gap-3"
                 >
-                  查看全部 <span className="text-xs">→</span>
+                  查看全部 <span>→</span>
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projects.filter(p => p.isSponsored).slice(0, 3).map(project => (
-                  <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
+                {projects.filter(p => p.isSponsored).slice(0, 3).map((project, idx) => (
+                  <div key={project.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    <ProjectCard project={project} onClick={() => handleProjectClick(project)} />
+                  </div>
                 ))}
               </div>
             </section>
 
             {/* Main Marketplace - Preview (6 items) */}
-            <section>
-              <div className="flex items-end justify-between mb-6 px-2">
-                <div className="flex items-center space-x-4">
-                  <h2 className="text-2xl font-bold tracking-tight">所有机会</h2>
-                  <div className="h-[2px] w-8 bg-indigo-600"></div>
+            {/* All Opportunities - Enhanced */}
+            <section className="mb-10">
+              <div className="flex items-end justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight">所有机会</h2>
+                  <div className="h-1 w-12 bg-gradient-to-r from-wealth-light to-wealth-DEFAULT rounded-full"></div>
                 </div>
                 <button
-                  onClick={() => handleViewChange('opportunities')}
-                  className="text-sm text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 transition-colors"
+                  onClick={(e) => {
+                    createRipple(e);
+                    handleViewChange('opportunities');
+                  }}
+                  className="text-base text-wealth-DEFAULT hover:text-wealth-light font-medium flex items-center gap-2 transition-all hover:gap-3"
                 >
-                  查看全部 <span className="text-xs">→</span>
+                  查看全部 <span>→</span>
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProjects.slice(0, 6).map(project => (
-                  <ProjectCard key={project.id} project={project} onClick={() => handleProjectClick(project)} />
+                {filteredProjects.slice(0, 6).map((project, idx) => (
+                  <div key={project.id} className="animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    <ProjectCard project={project} onClick={() => handleProjectClick(project)} />
+                  </div>
                 ))}
               </div>
             </section>
 
             {/* Pricing Section stays on Home */}
-            <section className="pt-16 border-t border-slate-800/50">
-              <div className="text-center mb-10">
+            <section className="pt-10 border-t border-slate-800/50">
+              <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold mb-3 tracking-tight">发布您的项目</h2>
                 <p className="text-slate-400 text-base max-w-2xl mx-auto">选择合适的方案，让全球 Agent 发现您的任务</p>
               </div>
@@ -322,7 +363,7 @@ const App: React.FC = () => {
                     onClick={() => setSelectedCategory(cat.id)}
                     className={`flex items-center space-x-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap
                       ${selectedCategory === cat.id
-                        ? 'accent-subtle text-indigo-400 border border-indigo-500/30'
+                        ? 'accent-subtle text-wealth-light border border-wealth-light/30'
                         : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-slate-300'
                       }`}
                   >
@@ -344,7 +385,7 @@ const App: React.FC = () => {
                 <p className="text-slate-500 mb-2">该分类下暂无项目</p>
                 <button
                   onClick={() => setSelectedCategory('all')}
-                  className="text-indigo-400 hover:text-indigo-300 text-sm underline"
+                  className="text-wealth-DEFAULT hover:text-wealth-light text-sm underline"
                 >
                   查看所有类别
                 </button>
@@ -365,15 +406,15 @@ const App: React.FC = () => {
       )}
 
       {/* Footer - mcpmarket.com style */}
-      <footer className="border-t border-slate-800 mt-24 pt-16 pb-8">
+      <footer className="border-t border-slate-800 mt-12 pt-8 pb-8">
         <div className="max-w-7xl mx-auto px-6">
           {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             {/* Brand Column */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">A</span>
+                <div className="w-8 h-8 bg-wealth-DEFAULT rounded-lg flex items-center justify-center shadow-lg shadow-wealth-DEFAULT/20">
+                  <span className="text-void font-bold text-sm">A</span>
                 </div>
                 <span className="text-white font-bold text-lg">AgentEarn</span>
               </div>
@@ -437,28 +478,36 @@ const App: React.FC = () => {
 
 const PricingCard: React.FC<{ price: number, title: string, duration: string, description: string, featured?: boolean, isFree?: boolean, onSelect: () => void }> = ({ price, title, duration, description, featured, isFree, onSelect }) => (
   <div
-    className={`card-clean p-5 rounded-xl transition-all hover:scale-[1.02] cursor-pointer relative ${featured ? 'ring-2 ring-indigo-500' : ''} ${isFree ? 'ring-2 ring-green-500' : ''}`}
-    onClick={onSelect}
+    className={`card-clean p-7 rounded-3xl transition-all hover:scale-105 cursor-pointer relative group ${featured ? 'ring-2 ring-indigo-500/50 animate-glow-pulse' : ''
+      } ${isFree ? 'ring-2 ring-green-500/50' : ''
+      }`}
+    onClick={(e) => {
+      createRipple(e as any);
+      onSelect();
+    }}
   >
-    {featured && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">推荐</div>}
-    {isFree && <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-green-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">免费</div>}
-    <div className="text-xs text-slate-500 font-medium mb-1.5">{duration}</div>
-    <h3 className="text-lg font-bold text-white mb-3">{title}</h3>
-    <div className="mb-4 flex items-baseline">
+    {featured && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">推荐</div>}
+    {isFree && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">免费</div>}
+    <div className="text-sm text-slate-400 font-medium mb-2">{duration}</div>
+    <h3 className="text-xl font-bold text-white mb-4">{title}</h3>
+    <div className="mb-6 flex items-baseline">
       {isFree ? (
-        <span className="text-3xl font-bold text-green-400">免费</span>
+        <span className="text-4xl font-bold gradient-text">免费</span>
       ) : (
         <>
-          <span className="text-3xl font-bold text-white">${price}</span>
-          <span className="ml-1.5 text-xs text-slate-500">/USD</span>
+          <span className="text-4xl font-bold gradient-text">${price}</span>
+          <span className="ml-2 text-sm text-slate-400">/USD</span>
         </>
       )}
     </div>
-    <p className="text-xs text-slate-400 mb-5 leading-relaxed">{description}</p>
-    <button className={`w-full py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm ${isFree ? 'bg-green-600 hover:bg-green-500 text-white' : featured ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-slate-700 hover:bg-slate-600 text-white'}`}>
+    <p className="text-sm text-slate-300 mb-6 leading-relaxed min-h-[3rem]">{description}</p>
+    <button className={`w-full py-3 rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-base ${isFree ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white shadow-lg shadow-green-600/30' :
+      featured ? 'bg-gradient-to-r from-wealth-light to-wealth-DEFAULT hover:from-wealth-light hover:to-wealth-dark text-slate-900 shadow-lg shadow-wealth-DEFAULT/30' :
+        'glass hover:bg-white/10 text-white'
+      }`}>
       {isFree ? (
         <>
-          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" /></svg>
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
           关注 Twitter
         </>
       ) : '选择方案'}
@@ -472,16 +521,20 @@ const ProjectCard: React.FC<{ project: Project, onClick: () => void }> = ({ proj
   return (
     <div
       onClick={onClick}
-      className="card-clean p-6 rounded-2xl cursor-pointer flex flex-col h-full"
+      className="card-clean p-7 rounded-3xl cursor-pointer flex flex-col h-full group"
     >
-      <div className="flex items-start gap-4 mb-4">
-        <img src={project.icon} alt={project.title} className="w-14 h-14 rounded-xl border border-slate-700 bg-slate-900 flex-shrink-0" />
+      <div className="flex items-start gap-4 mb-5">
+        <img
+          src={project.icon}
+          alt={project.title}
+          className="w-16 h-16 rounded-2xl border border-white/10 bg-black/50 flex-shrink-0 group-hover:scale-110 transition-transform duration-300"
+        />
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-white mb-1 truncate">{project.title}</h3>
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <h3 className="text-xl font-bold text-white mb-2 truncate group-hover:text-indigo-300 transition-colors">{project.title}</h3>
+          <div className="flex items-center gap-3 text-sm text-slate-400">
             <div className="flex items-center">
-              <svg className="w-3 h-3 fill-yellow-500 mr-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
-              <span>{project.rating}</span>
+              <svg className="w-4 h-4 fill-yellow-400 mr-1.5" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+              <span className="font-semibold">{project.rating}</span>
             </div>
             <span>•</span>
             <span>{project.activeAgents.toLocaleString()} agents</span>
@@ -489,14 +542,16 @@ const ProjectCard: React.FC<{ project: Project, onClick: () => void }> = ({ proj
         </div>
       </div>
 
-      <p className="text-sm text-slate-400 line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
+      <p className="text-base text-slate-300 line-clamp-2 mb-6 leading-relaxed">{project.description}</p>
 
-      <div className="mt-auto pt-4 border-t border-slate-700/50 flex items-center justify-between">
+      <div className="mt-auto pt-5 border-t border-white/5 flex items-center justify-between">
         <div>
-          <div className="text-xs text-slate-500 mb-0.5">单次收益</div>
-          <div className="text-base font-bold text-white">{project.earningsPerTask}</div>
+          <div className="text-sm text-slate-400 mb-1">单次收益</div>
+          <div className="text-lg font-bold gradient-text">{project.earningsPerTask}</div>
         </div>
-        <div className="text-indigo-400 text-sm font-medium">查看详情 →</div>
+        <div className="text-wealth-light text-base font-medium flex items-center gap-2 group-hover:gap-3 transition-all">
+          查看详情 <span>→</span>
+        </div>
       </div>
     </div>
   );

@@ -210,8 +210,8 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
             {/* Left Sidebar - Tab Navigation (always visible) */}
             <div className="w-48 border-r border-slate-800 bg-slate-900/50 flex flex-col">
                 <div className="p-4 border-b border-slate-800 flex items-center gap-2">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 bg-wealth-DEFAULT rounded-lg flex items-center justify-center shadow-lg shadow-wealth-DEFAULT/20">
+                        <svg className="w-5 h-5 text-void" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                         </svg>
                     </div>
@@ -225,28 +225,24 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
                 <div className="flex-1 p-3 space-y-2">
                     <button
                         onClick={() => setActiveTab('chat')}
-                        className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'chat'
-                            ? 'bg-indigo-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
-                            }`}
+                        className="w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all"
+                        style={activeTab === 'chat' ? { backgroundColor: '#05D69E', color: '#0B0F19', boxShadow: '0 10px 15px -3px rgba(5, 214, 158, 0.2)' } : {}}
                     >
-                        <div className="flex items-center gap-2">
+                        <div className={`flex items-center gap-2 ${activeTab !== 'chat' ? 'text-slate-400 hover:text-slate-300' : ''}`}>
                             <span className="text-base">💬</span>
                             <span>聊天</span>
                         </div>
                     </button>
                     <button
                         onClick={() => setActiveTab('projects')}
-                        className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'projects'
-                            ? 'bg-indigo-600 text-white shadow-lg'
-                            : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
-                            }`}
+                        className="w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all"
+                        style={activeTab === 'projects' ? { backgroundColor: '#05D69E', color: '#0B0F19', boxShadow: '0 10px 15px -3px rgba(5, 214, 158, 0.2)' } : {}}
                     >
-                        <div className="flex items-center gap-2">
+                        <div className={`flex items-center gap-2 ${activeTab !== 'projects' ? 'text-slate-400 hover:text-slate-300' : ''}`}>
                             <span className="text-base">📦</span>
                             <div className="flex-1">
                                 <div>我的项目</div>
-                                <div className="text-xs opacity-70">({existingProjects.length})</div>
+                                <div className={`text-xs ${activeTab === 'projects' ? 'opacity-70' : 'opacity-70'}`}>({existingProjects.length})</div>
                             </div>
                         </div>
                     </button>
@@ -300,7 +296,7 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
                                         <button
                                             onClick={handleSendMessage}
                                             disabled={!inputValue.trim() || isAITyping}
-                                            className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-colors"
+                                            className="bg-wealth-DEFAULT hover:bg-wealth-dark disabled:bg-slate-700 disabled:cursor-not-allowed text-void p-3 rounded-lg transition-colors shadow-lg shadow-wealth-DEFAULT/20"
                                         >
                                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -350,7 +346,7 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
                                 <button
                                     onClick={handleConfirmProject}
                                     disabled={!draft.title || !draft.description}
-                                    className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                    className="w-full bg-wealth-DEFAULT hover:bg-wealth-dark disabled:bg-slate-700 disabled:cursor-not-allowed text-void font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-wealth-DEFAULT/20"
                                 >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

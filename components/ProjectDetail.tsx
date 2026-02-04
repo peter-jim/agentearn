@@ -71,14 +71,14 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
       <div className="sticky top-0 z-30 glass border-b border-slate-800 px-6 py-4 backdrop-blur-md bg-slate-950/90">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
+            <div className="w-8 h-8 bg-wealth-DEFAULT rounded-lg flex items-center justify-center shadow-lg shadow-wealth-DEFAULT/20">
+              <span className="text-void font-bold text-sm">A</span>
             </div>
             <span className="text-white font-bold text-lg">AgentEarn</span>
           </div>
           <button
             onClick={onClose}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            className="bg-wealth-DEFAULT hover:bg-wealth-dark text-void px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-lg shadow-wealth-DEFAULT/20">
             发布项目
           </button>
         </div>
@@ -101,20 +101,20 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-6 max-w-6xl">
+      <div className="container mx-auto px-6 py-4 max-w-6xl">
         {/* Compact Hero Section */}
-        <div className="flex items-start gap-6 mb-6">
-          <img src={project.icon} alt={project.title} className="w-20 h-20 rounded-2xl border border-slate-800 bg-slate-900 object-cover flex-shrink-0" />
+        <div className="flex items-start gap-4 mb-4">
+          <img src={project.icon} alt={project.title} className="w-16 h-16 rounded-2xl border border-slate-800 bg-slate-900 object-cover flex-shrink-0" />
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold text-white truncate">{project.title}</h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-white truncate">{project.title}</h1>
               {project.isSponsored && (
-                <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded text-xs font-bold">VERIFIED</span>
+                <span className="bg-wealth-dark/20 text-wealth-light border border-wealth-light/30 px-2 py-0.5 rounded text-xs font-bold">VERIFIED</span>
               )}
             </div>
 
-            <div className="flex items-center gap-3 text-xs text-slate-400 mb-3">
+            <div className="flex items-center gap-3 text-xs text-slate-400 mb-2">
               <div className="flex items-center text-yellow-400">
                 <svg className="w-3.5 h-3.5 fill-current mr-1" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
                 <span className="font-bold text-white">{project.rating}</span>
@@ -122,20 +122,20 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
               <span className="w-1 h-1 bg-slate-700 rounded-full"></span>
               <span className="uppercase">{project.category}</span>
               <span className="w-1 h-1 bg-slate-700 rounded-full"></span>
-              <span className="text-indigo-400">{project.activeAgents.toLocaleString()} Active Agents</span>
+              <span className="text-wealth-light font-medium">{project.activeAgents.toLocaleString()} Active Agents</span>
             </div>
 
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-sm text-slate-400 leading-relaxed line-clamp-2">
               {project.description}
             </p>
           </div>
         </div>
 
         {/* Horizontal Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-4">
           {[
             { label: 'YIELD PER TASK', value: project.earningsPerTask, color: 'text-white' },
-            { label: 'TOTAL DISTRIBUTED', value: project.totalPayout, color: 'text-green-400' },
+            { label: 'TOTAL DISTRIBUTED', value: project.totalPayout, color: 'text-wealth-DEFAULT' },
             { label: 'PAYOUT SPEED', value: 'Instant (T+0)', color: 'text-white' }
           ].map((stat, idx) => (
             <div key={idx} className="bg-slate-900/50 border border-slate-800 p-4 rounded-xl">
@@ -146,7 +146,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-slate-800 mb-6">
+        <div className="border-b border-slate-800 mb-4">
           <div className="flex gap-6">
             {[
               { id: 'readme' as const, label: 'README' },
@@ -173,7 +173,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
         {/* Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Main Column */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-4">
             {activeTab === 'readme' && (
               <>
                 <section>
@@ -277,8 +277,8 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
                           onClick={() => handleVote(review.id, 'helpful')}
                           disabled={votedReviews.has(review.id)}
                           className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${votedReviews.has(review.id)
-                              ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
-                              : 'bg-slate-900/50 text-slate-400 hover:bg-green-500/10 hover:text-green-400 border border-slate-800 hover:border-green-500/30'
+                            ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                            : 'bg-slate-900/50 text-slate-400 hover:bg-green-500/10 hover:text-green-400 border border-slate-800 hover:border-green-500/30'
                             }`}
                         >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -290,8 +290,8 @@ const ProjectDetail: React.FC<ProjectDetailProps> = ({ project, onClose }) => {
                           onClick={() => handleVote(review.id, 'unhelpful')}
                           disabled={votedReviews.has(review.id)}
                           className={`flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${votedReviews.has(review.id)
-                              ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
-                              : 'bg-slate-900/50 text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-slate-800 hover:border-red-500/30'
+                            ? 'bg-slate-800/50 text-slate-600 cursor-not-allowed'
+                            : 'bg-slate-900/50 text-slate-400 hover:bg-red-500/10 hover:text-red-400 border border-slate-800 hover:border-red-500/30'
                             }`}
                         >
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
