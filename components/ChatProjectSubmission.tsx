@@ -207,66 +207,64 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
 
     return (
         <div className="fixed inset-0 bg-slate-950 z-50 flex">
-            {/* Left Sidebar - Tab Navigation (hidden when project detail is shown) */}
-            {!(activeTab === 'projects' && selectedProject) && (
-                <div className="w-48 border-r border-slate-800 bg-slate-900/50 flex flex-col">
-                    <div className="p-4 border-b border-slate-800 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                            </svg>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <h3 className="text-white font-bold text-xs truncate">AgentEarn</h3>
-                            <p className="text-xs text-slate-500 truncate">助手</p>
-                        </div>
+            {/* Left Sidebar - Tab Navigation (always visible) */}
+            <div className="w-48 border-r border-slate-800 bg-slate-900/50 flex flex-col">
+                <div className="p-4 border-b border-slate-800 flex items-center gap-2">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
                     </div>
-
-                    {/* Tab Buttons */}
-                    <div className="flex-1 p-3 space-y-2">
-                        <button
-                            onClick={() => setActiveTab('chat')}
-                            className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'chat'
-                                ? 'bg-indigo-600 text-white shadow-lg'
-                                : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
-                                }`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <span className="text-base">💬</span>
-                                <span>聊天</span>
-                            </div>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('projects')}
-                            className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'projects'
-                                ? 'bg-indigo-600 text-white shadow-lg'
-                                : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
-                                }`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <span className="text-base">📦</span>
-                                <div className="flex-1">
-                                    <div>我的项目</div>
-                                    <div className="text-xs opacity-70">({existingProjects.length})</div>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-
-                    {/* Close Button */}
-                    <div className="p-3 border-t border-slate-800">
-                        <button
-                            onClick={onClose}
-                            className="w-full px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            关闭
-                        </button>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-white font-bold text-xs truncate">AgentEarn</h3>
+                        <p className="text-xs text-slate-500 truncate">助手</p>
                     </div>
                 </div>
-            )}
+
+                {/* Tab Buttons */}
+                <div className="flex-1 p-3 space-y-2">
+                    <button
+                        onClick={() => setActiveTab('chat')}
+                        className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'chat'
+                            ? 'bg-indigo-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
+                            }`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <span className="text-base">💬</span>
+                            <span>聊天</span>
+                        </div>
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('projects')}
+                        className={`w-full px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all ${activeTab === 'projects'
+                            ? 'bg-indigo-600 text-white shadow-lg'
+                            : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-300'
+                            }`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <span className="text-base">📦</span>
+                            <div className="flex-1">
+                                <div>我的项目</div>
+                                <div className="text-xs opacity-70">({existingProjects.length})</div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                {/* Close Button */}
+                <div className="p-3 border-t border-slate-800">
+                    <button
+                        onClick={onClose}
+                        className="w-full px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800/50 hover:text-white transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        关闭
+                    </button>
+                </div>
+            </div>
 
             {/* Main Content Area */}
             <div className="flex-1 flex">
@@ -369,179 +367,179 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
 
                 {/* Projects Tab */}
                 {activeTab === 'projects' && (
-                    <>
-                        {/* Projects Grid */}
-                        <div className="flex-1 overflow-y-auto p-6 bg-slate-950">
-                            <div className={selectedProject ? "max-w-full mx-auto px-4" : "max-w-6xl mx-auto"}>
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-xl font-bold text-white">我的项目</h3>
-                                    {selectedProject && (
-                                        <button
-                                            onClick={() => setSelectedProject(null)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors text-sm"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                            </svg>
-                                            返回列表
-                                        </button>
-                                    )}
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        {!selectedProject ? (
+                            // Project Grid View
+                            <>
+                                <div className="flex-1 overflow-y-auto p-6 bg-slate-950">
+                                    <div className="max-w-6xl mx-auto">
+                                        <h3 className="text-xl font-bold text-white mb-6">我的项目</h3>
+                                        {existingProjects.length === 0 ? (
+                                            <div className="text-center py-20">
+                                                <svg className="w-16 h-16 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                                </svg>
+                                                <p className="text-slate-500 mb-2">暂无项目</p>
+                                                <button
+                                                    onClick={() => setActiveTab('chat')}
+                                                    className="text-indigo-400 hover:text-indigo-300 text-sm underline"
+                                                >
+                                                    去创建第一个项目
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {existingProjects.map(project => (
+                                                    <div
+                                                        key={project.id}
+                                                        onClick={() => setSelectedProject(project)}
+                                                        className="bg-slate-900/50 rounded-xl p-4 border border-slate-800 cursor-pointer transition-all hover:border-indigo-500"
+                                                    >
+                                                        <div className="flex items-start gap-3 mb-3">
+                                                            <img src={project.icon} className="w-12 h-12 rounded-lg" alt={project.title} />
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="text-sm font-bold text-white truncate">{project.title}</h4>
+                                                                <p className="text-xs text-slate-500">{project.category}</p>
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-xs text-slate-400 line-clamp-2 mb-3">{project.description}</p>
+                                                        <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-800">
+                                                            <div>
+                                                                <span className="text-slate-500">Agent: </span>
+                                                                <span className="text-indigo-400 font-bold">{project.activeAgents}</span>
+                                                            </div>
+                                                            <div className="text-green-400 font-bold">{project.totalPayout}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                {existingProjects.length === 0 ? (
-                                    <div className="text-center py-20">
-                                        <svg className="w-16 h-16 text-slate-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                                        </svg>
-                                        <p className="text-slate-500 mb-2">暂无项目</p>
-                                        <button
-                                            onClick={() => setActiveTab('chat')}
-                                            className="text-indigo-400 hover:text-indigo-300 text-sm underline"
-                                        >
-                                            去创建第一个项目
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {existingProjects.map(project => (
-                                            <div
-                                                key={project.id}
-                                                onClick={() => setSelectedProject(project)}
-                                                className={`bg-slate-900/50 rounded-xl p-4 border cursor-pointer transition-all hover:border-indigo-500 ${selectedProject?.id === project.id
-                                                    ? 'border-indigo-500 ring-2 ring-indigo-500/20'
-                                                    : 'border-slate-800'
-                                                    }`}
-                                            >
-                                                <div className="flex items-start gap-3 mb-3">
-                                                    <img src={project.icon} className="w-12 h-12 rounded-lg" alt={project.title} />
-                                                    <div className="flex-1 min-w-0">
-                                                        <h4 className="text-sm font-bold text-white truncate">{project.title}</h4>
-                                                        <p className="text-xs text-slate-500">{project.category}</p>
-                                                    </div>
-                                                </div>
-                                                <p className="text-xs text-slate-400 line-clamp-2 mb-3">{project.description}</p>
-                                                <div className="flex items-center justify-between text-xs pt-3 border-t border-slate-800">
-                                                    <div>
-                                                        <span className="text-slate-500">Agent: </span>
-                                                        <span className="text-indigo-400 font-bold">{project.activeAgents}</span>
-                                                    </div>
-                                                    <div className="text-green-400 font-bold">{project.totalPayout}</div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Right Sidebar - Project Detail */}
-                        <div className="w-96 border-l border-slate-800 bg-slate-900/50 flex flex-col">
-                            {selectedProject ? (
-                                <>
-                                    <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-                                        <h3 className="text-white font-bold text-sm">项目详情</h3>
+                            </>
+                        ) : (
+                            // Full-Width Project Detail View
+                            <div className="flex-1 flex flex-col overflow-hidden">
+                                {/* Breadcrumb Navigation */}
+                                <div className="px-6 py-4 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
+                                    <div className="flex items-center gap-2 text-sm">
                                         <button
                                             onClick={() => setSelectedProject(null)}
-                                            className="text-slate-400 hover:text-white transition-colors"
+                                            className="text-indigo-400 hover:text-indigo-300 transition-colors"
                                         >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
+                                            我的项目
                                         </button>
+                                        <svg className="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                        <span className="text-white font-medium">{selectedProject.title}</span>
                                     </div>
-                                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                                        <div className="text-center pb-4 border-b border-slate-800">
-                                            <img src={selectedProject.icon} className="w-20 h-20 rounded-xl mx-auto mb-3" alt={selectedProject.title} />
-                                            <h3 className="text-lg font-bold text-white mb-1">{selectedProject.title}</h3>
-                                            <p className="text-xs text-slate-500">{selectedProject.category}</p>
-                                        </div>
+                                </div>
 
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                                                <p className="text-xs text-slate-500 mb-1">活跃Agent</p>
-                                                <p className="text-xl font-bold text-indigo-400">{selectedProject.activeAgents}</p>
+                                {/* Project Detail Content */}
+                                <div className="flex-1 overflow-y-auto p-8 bg-slate-950">
+                                    <div className="max-w-4xl mx-auto space-y-8">
+                                        {/* Header */}
+                                        <div className="flex items-start gap-6">
+                                            <img src={selectedProject.icon} className="w-24 h-24 rounded-2xl shadow-lg" alt={selectedProject.title} />
+                                            <div className="flex-1">
+                                                <h1 className="text-3xl font-bold text-white mb-2">{selectedProject.title}</h1>
+                                                <p className="text-slate-400 mb-4">{selectedProject.category}</p>
+                                                <div className="flex items-center gap-6">
+                                                    <div className="flex items-center gap-2">
+                                                        <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                                        </svg>
+                                                        <span className="text-white font-bold">{selectedProject.activeAgents}</span>
+                                                        <span className="text-slate-500 text-sm">活跃Agent</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        <span className="text-white font-bold">{selectedProject.totalPayout}</span>
+                                                        <span className="text-slate-500 text-sm">总收益</span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                                                <p className="text-xs text-slate-500 mb-1">总收益</p>
-                                                <p className="text-xl font-bold text-green-400">{selectedProject.totalPayout}</p>
-                                            </div>
                                         </div>
 
-                                        <div>
-                                            <p className="text-xs text-slate-500 mb-2">项目描述</p>
-                                            <p className="text-sm text-slate-300">{selectedProject.description}</p>
+                                        {/* Description */}
+                                        <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
+                                            <h2 className="text-lg font-bold text-white mb-3">项目描述</h2>
+                                            <p className="text-slate-300 leading-relaxed">{selectedProject.description}</p>
                                         </div>
 
+                                        {/* Long Description */}
                                         {selectedProject.longDescription && (
-                                            <div>
-                                                <p className="text-xs text-slate-500 mb-2">详细说明</p>
-                                                <p className="text-sm text-slate-300 leading-relaxed">{selectedProject.longDescription}</p>
+                                            <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
+                                                <h2 className="text-lg font-bold text-white mb-3">详细说明</h2>
+                                                <p className="text-slate-300 leading-relaxed whitespace-pre-line">{selectedProject.longDescription}</p>
                                             </div>
                                         )}
 
-                                        <div>
-                                            <p className="text-xs text-slate-500 mb-2">收益信息</p>
-                                            <div className="bg-slate-800/30 rounded-lg p-3">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs text-slate-400">每任务收益</span>
-                                                    <span className="text-sm font-bold text-green-400">{selectedProject.earningsPerTask}</span>
-                                                </div>
-                                                {selectedProject.whyItEarns && (
-                                                    <p className="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-700">{selectedProject.whyItEarns}</p>
-                                                )}
+                                        {/* Earnings Info */}
+                                        <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 rounded-xl p-6 border border-green-800/30">
+                                            <h2 className="text-lg font-bold text-white mb-3">收益信息</h2>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <span className="text-slate-400">每任务收益</span>
+                                                <span className="text-2xl font-bold text-green-400">{selectedProject.earningsPerTask}</span>
                                             </div>
+                                            {selectedProject.whyItEarns && (
+                                                <p className="text-slate-300 text-sm leading-relaxed">{selectedProject.whyItEarns}</p>
+                                            )}
                                         </div>
 
+                                        {/* API Information */}
                                         {selectedProject.skills && selectedProject.skills.length > 0 && (
-                                            <div>
-                                                <p className="text-xs text-slate-500 mb-2">API信息</p>
-                                                <div className="bg-slate-800/30 rounded-lg p-3 space-y-2">
-                                                    <div>
-                                                        <span className="text-xs text-slate-500">端点: </span>
-                                                        <span className="text-xs text-slate-300 font-mono break-all">{selectedProject.skills[0].endpoint}</span>
+                                            <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
+                                                <h2 className="text-lg font-bold text-white mb-4">API信息</h2>
+                                                <div className="space-y-3">
+                                                    <div className="flex items-start gap-3">
+                                                        <span className="text-slate-500 text-sm w-20 flex-shrink-0">端点:</span>
+                                                        <code className="text-indigo-400 text-sm font-mono break-all flex-1">{selectedProject.skills[0].endpoint}</code>
                                                     </div>
-                                                    <div>
-                                                        <span className="text-xs text-slate-500">方法: </span>
-                                                        <span className="text-xs text-indigo-400 font-bold">{selectedProject.skills[0].method}</span>
+                                                    <div className="flex items-start gap-3">
+                                                        <span className="text-slate-500 text-sm w-20 flex-shrink-0">方法:</span>
+                                                        <span className="text-white text-sm font-bold">{selectedProject.skills[0].method}</span>
                                                     </div>
+                                                    {selectedProject.skills[0].description && (
+                                                        <div className="flex items-start gap-3">
+                                                            <span className="text-slate-500 text-sm w-20 flex-shrink-0">说明:</span>
+                                                            <span className="text-slate-300 text-sm flex-1">{selectedProject.skills[0].description}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         )}
 
+                                        {/* External Links */}
                                         {selectedProject.externalLinks && selectedProject.externalLinks.length > 0 && (
-                                            <div>
-                                                <p className="text-xs text-slate-500 mb-2">外部链接</p>
-                                                <div className="space-y-2">
+                                            <div className="bg-slate-900/50 rounded-xl p-6 border border-slate-800">
+                                                <h2 className="text-lg font-bold text-white mb-4">外部链接</h2>
+                                                <div className="space-y-3">
                                                     {selectedProject.externalLinks.map((link, idx) => (
                                                         <a
                                                             key={idx}
                                                             href={link.url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                                                            className="flex items-center gap-3 text-indigo-400 hover:text-indigo-300 transition-colors group"
                                                         >
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                             </svg>
-                                                            {link.label}
+                                                            <span className="group-hover:underline">{link.label}</span>
                                                         </a>
                                                     ))}
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-                                </>
-                            ) : (
-                                <div className="flex-1 flex items-center justify-center p-6">
-                                    <div className="text-center">
-                                        <svg className="w-16 h-16 text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                                        </svg>
-                                        <p className="text-slate-500 text-sm">点击项目查看详情</p>
-                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    </>
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>
