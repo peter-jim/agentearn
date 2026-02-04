@@ -360,6 +360,7 @@ const App: React.FC = () => {
         <ChatProjectSubmission
           onClose={() => setShowChatSubmission(false)}
           onSubmit={handleNewProject}
+          existingProjects={projects}
         />
       )}
 

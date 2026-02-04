@@ -6,9 +6,12 @@ import MessageBubble from './MessageBubble';
 interface ChatProjectSubmissionProps {
     onClose: () => void;
     onSubmit: (project: Project) => void;
+    existingProjects?: Project[];
 }
 
-const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, onSubmit }) => {
+type DashboardTab = 'projects' | 'earnings' | 'agents';
+
+const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, onSubmit, existingProjects = [] }) => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [isAITyping, setIsAITyping] = useState(false);
@@ -17,6 +20,7 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
     const inputRef = useRef<HTMLInputElement>(null);
     const [draft, setDraft] = useState<ProjectDraft>({});
     const [editingField, setEditingField] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<DashboardTab>('projects');
 
     useEffect(() => {
         // Initialize with AI greeting
@@ -210,27 +214,149 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
         );
     };
 
+    // Calculate stats
+    const totalEarnings = existingProjects.reduce((sum, p) => {
+        const earnings = parseFloat(p.totalPayout.replace(/[$,]/g, '')) || 0;
+        return sum + earnings;
+    }, 0);
+
+    const totalAgents = existingProjects.reduce((sum, p) => sum + p.activeAgents, 0);
+
     return (
         <div className="fixed inset-0 bg-slate-950 z-50 flex">
-            {/* Left Sidebar - Dashboard */}
+            {/* Left Sidebar - Dashboard with Tabs */}
             <div className="w-64 border-r border-slate-800 bg-slate-900/50 flex flex-col">
                 <div className="p-4 border-b border-slate-800">
                     <h3 className="text-white font-bold text-sm mb-1">Dashboard</h3>
                     <p className="text-xs text-slate-500">管理自己的账户</p>
                 </div>
-                <div className="flex-1 p-4 space-y-3">
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                        <p className="text-xs text-slate-400 mb-1">我的项目</p>
-                        <p className="text-xl font-bold text-white">0</p>
+
+                {/* Tab Navigation */}
+                <div className="border-b border-slate-800">
+                    <div className="flex">
+                        <button
+                            onClick={() => setActiveTab('projects')}
+                            className={`flex-1 px-4 py-3 text-xs font-medium transition-colors border-b-2 ${activeTab === 'projects'
+                                    ? 'text-indigo-400 border-indigo-500 bg-slate-800/30'
+                                    : 'text-slate-500 border-transparent hover:text-slate-300'
+                                }`}
+                        >
+                            我的项目
+                            <div className="text-lg font-bold mt-1">{existingProjects.length}</div>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('earnings')}
+                            className={`flex-1 px-4 py-3 text-xs font-medium transition-colors border-b-2 ${activeTab === 'earnings'
+                                    ? 'text-green-400 border-green-500 bg-slate-800/30'
+                                    : 'text-slate-500 border-transparent hover:text-slate-300'
+                                }`}
+                        >
+                            总收益
+                            <div className="text-lg font-bold mt-1">${totalEarnings.toFixed(2)}</div>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('agents')}
+                            className={`flex-1 px-4 py-3 text-xs font-medium transition-colors border-b-2 ${activeTab === 'agents'
+                                    ? 'text-indigo-400 border-indigo-500 bg-slate-800/30'
+                                    : 'text-slate-500 border-transparent hover:text-slate-300'
+                                }`}
+                        >
+                            活跃Agent
+                            <div className="text-lg font-bold mt-1">{totalAgents}</div>
+                        </button>
                     </div>
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                        <p className="text-xs text-slate-400 mb-1">总收益</p>
-                        <p className="text-xl font-bold text-green-400">$0.00</p>
-                    </div>
-                    <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                        <p className="text-xs text-slate-400 mb-1">活跃Agent</p>
-                        <p className="text-xl font-bold text-indigo-400">0</p>
-                    </div>
+                </div>
+
+                {/* Tab Content */}
+                <div className="flex-1 overflow-y-auto p-4">
+                    {activeTab === 'projects' && (
+                        <div className="space-y-3">
+                            {existingProjects.length === 0 ? (
+                                <div className="text-center py-8">
+                                    <svg className="w-12 h-12 text-slate-700 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                    </svg>
+                                    <p className="text-xs text-slate-500">暂无项目</p>
+                                </div>
+                            ) : (
+                                existingProjects.map(project => (
+                                    <div key={project.id} className="bg-slate-800/50 rounded-lg p-3 border border-slate-700 hover:border-slate-600 transition-colors">
+                                        <div className="flex items-start gap-2 mb-2">
+                                            <img src={project.icon} className="w-8 h-8 rounded-lg" alt={project.title} />
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-sm font-bold text-white truncate">{project.title}</h4>
+                                                <p className="text-xs text-slate-500">{project.category}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center justify-between text-xs">
+                                            <div>
+                                                <span className="text-slate-500">Agent: </span>
+                                                <span className="text-indigo-400 font-bold">{project.activeAgents}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-green-400 font-bold">{project.totalPayout}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'earnings' && (
+                        <div className="space-y-3">
+                            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                                <p className="text-xs text-slate-500 mb-1">总收益</p>
+                                <p className="text-2xl font-bold text-green-400">${totalEarnings.toFixed(2)}</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-xs text-slate-500 font-medium">项目收益明细</p>
+                                {existingProjects.length === 0 ? (
+                                    <p className="text-xs text-slate-600 text-center py-4">暂无收益数据</p>
+                                ) : (
+                                    existingProjects.map(project => {
+                                        const earnings = parseFloat(project.totalPayout.replace(/[$,]/g, '')) || 0;
+                                        return (
+                                            <div key={project.id} className="flex items-center justify-between bg-slate-800/30 rounded p-2">
+                                                <span className="text-xs text-slate-300 truncate flex-1">{project.title}</span>
+                                                <span className="text-xs text-green-400 font-bold ml-2">{project.totalPayout}</span>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'agents' && (
+                        <div className="space-y-3">
+                            <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                                <p className="text-xs text-slate-500 mb-1">活跃Agent总数</p>
+                                <p className="text-2xl font-bold text-indigo-400">{totalAgents}</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-xs text-slate-500 font-medium">各项目Agent数量</p>
+                                {existingProjects.length === 0 ? (
+                                    <p className="text-xs text-slate-600 text-center py-4">暂无Agent数据</p>
+                                ) : (
+                                    existingProjects.map(project => (
+                                        <div key={project.id} className="flex items-center justify-between bg-slate-800/30 rounded p-2">
+                                            <span className="text-xs text-slate-300 truncate flex-1">{project.title}</span>
+                                            <div className="flex items-center gap-2 ml-2">
+                                                <div className="w-16 bg-slate-700 rounded-full h-1.5">
+                                                    <div
+                                                        className="bg-indigo-500 h-1.5 rounded-full"
+                                                        style={{ width: `${Math.min((project.activeAgents / Math.max(totalAgents, 1)) * 100, 100)}%` }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs text-indigo-400 font-bold w-8 text-right">{project.activeAgents}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -304,7 +430,7 @@ const ChatProjectSubmission: React.FC<ChatProjectSubmissionProps> = ({ onClose, 
             <div className="w-80 border-l border-slate-800 bg-slate-900/50 flex flex-col">
                 <div className="p-4 border-b border-slate-800">
                     <h3 className="text-white font-bold text-sm mb-1">已经配置的信息</h3>
-                    <p className="text-xs text-slate-500">点击任意字段可直接编辑</p>
+                    <p className="text-xs text-slate-500">logo、简介、之类的</p>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {/* Logo */}
